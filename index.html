@@ -212,7 +212,10 @@
         tg.ready();
         tg.expand();
 
-        function processRequest() {
+        // AQUÍ ABAJO: Borra lo que está dentro de las comillas y pega tu enlace morado de Make
+        const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/38cbym10tfqe2co0yomaj6p1...'; 
+
+        async function processRequest() {
             const input = document.getElementById('userInput').value;
             if (!input.trim()) {
                 alert("Por favor, escribe algo primero.");
@@ -220,16 +223,62 @@
             }
 
             const btn = document.getElementById('sendBtn');
+            const player = document.getElementById('player');
+            const audio = document.getElementById('audioElement');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const progressBar = document.getElementById('progressBar');
+
             btn.innerText = "Procesando con IA...";
             btn.disabled = true;
+            player.style.display = 'none';
 
-            console.log("Enviando a Make: ", input);
-            
-            setTimeout(() => {
+            try {
+                const response = await fetch(MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ mensaje: input })
+                });
+
+                if (!response.ok) throw new Error('Error en el servidor');
+
+                const blob = await response.blob();
+                const audioUrl = URL.createObjectURL(blob);
+                
+                audio.src = audioUrl;
+                player.style.display = 'block';
+                
+                audio.play();
+                playPauseBtn.innerText = "⏸";
+
+                playPauseBtn.onclick = () => {
+                    if (audio.paused) {
+                        audio.play();
+                        playPauseBtn.innerText = "⏸";
+                    } else {
+                        audio.pause();
+                        playPauseBtn.innerText = "▶";
+                    }
+                };
+
+                audio.ontimeupdate = () => {
+                    const percentage = (audio.currentTime / audio.duration) * 100;
+                    progressBar.style.width = percentage + '%';
+                };
+
+                audio.onended = () => {
+                    playPauseBtn.innerText = "▶";
+                    progressBar.style.width = '0%';
+                };
+
+            } catch (error) {
+                console.error(error);
+                alert("Hubo un problema al generar la voz. Inténtalo de nuevo.");
+            } finally {
                 btn.innerText = "Generar Respuesta de Voz";
                 btn.disabled = false;
-                document.getElementById('player').style.display = 'block';
-            }, 2000);
+            }
         }
     </script>
 </body>
