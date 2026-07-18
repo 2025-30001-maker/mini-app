@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Asistente Liceo Canadiense</title>
+    <!-- Script oficial de Telegram Web Apps -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1b2a;       /* Azul oscuro institucional para el fondo */
+            --container-bg: #ffffff;   /* Blanco para el contenedor principal */
+            --text-main: #0d1b2a;      /* Azul oscuro para títulos */
+            --text-muted: #4a5568;     /* Gris para subtítulos y textos secundarios */
+            --accent-color: #e53e3e;   /* Rojo Liceo Canadiense para botones y detalles */
+            --accent-hover: #c53030;   /* Rojo más oscuro al presionar */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 90vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--container-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), #feb2b2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4);
+            animation: pulse 3s infinite ease-in-out;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 10px 0 5px 0;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0 0 24px 0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 90px;
+            background-color: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            color: var(--text-main);
+            padding: 12px;
+            font-size: 15px;
+            resize: none;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            background-color: var(--accent-hover);
+        }
+
+        /* Reproductor de Audio */
+        .audio-player {
+            background-color: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 24px;
+            display: none;
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .play-btn {
+            background: var(--accent-color);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 6px;
+            background-color: #cbd5e0;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 4px 25px rgba(229, 62, 62, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="logo-container">
+            <div class="logo">🎙️</div>
+        </div>
+        
+        <h1>Asistente Liceo Canadiense</h1>
+        <p>Escribe tu consulta y la IA te responderá con voz profesional</p>
+
+        <div class="input-group">
+            <textarea id="userInput" placeholder="¿Sobre qué te gustaría investigar hoy?"></textarea>
+        </div>
+
+        <button class="btn" id="sendBtn" onclick="processRequest()">Generar Respuesta de Voz</button>
+
+        <!-- Reproductor oculto inicialmente -->
+        <div class="audio-player" id="player">
+            <div class="player-controls">
+                <button class="play-btn" id="playPauseBtn">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            <audio id="audioElement"></audio>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        function processRequest() {
+            const input = document.getElementById('userInput').value;
+            if (!input.trim()) {
+                alert("Por favor, escribe algo primero.");
+                return;
+            }
+
+            const btn = document.getElementById('sendBtn');
+            btn.innerText = "Procesando con IA...";
+            btn.disabled = true;
+
+            console.log("Enviando a Make: ", input);
+            
+            setTimeout(() => {
+                btn.innerText = "Generar Respuesta de Voz";
+                btn.disabled = false;
+                document.getElementById('player').style.display = 'block';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
