@@ -589,43 +589,27 @@
             color: var(--primary);
         }
 
-        /* 4. GAMES MODULE */
-        .games-hub {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .game-card {
-            background: rgba(15, 23, 42, 0.7);
+        /* 4. GAME MODULE (SINGLE FUNCTIONAL GAME) */
+        .game-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.75);
             border: 1px solid var(--surface-border);
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 25px;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        .game-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px var(--primary-glow);
-            transform: translateY(-5px);
-        }
-
-        .game-arena {
+        .game-canvas {
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            border-radius: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            height: 250px;
+            background: #000;
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
             position: relative;
+            overflow: hidden;
+            margin-top: 15px;
         }
 
         /* 5. QUOTES MODULE (INSPIRATION) */
@@ -759,7 +743,7 @@
                     <div class="dash-icon"><i class="fa-solid fa-gamepad"></i></div>
                     <div class="dash-info">
                         <h3>Centro de Juegos</h3>
-                        <p>Plataforma de entretenimiento con trivias, arcade y records globales.</p>
+                        <p>Minijuego interactivo optimizado y totalmente funcional.</p>
                     </div>
                 </div>
 
@@ -777,7 +761,7 @@
                     <div class="dash-icon"><i class="fa-solid fa-calendar-days"></i></div>
                     <div class="dash-info">
                         <h3>Eventos & Actividades</h3>
-                        <p>Calendario dinámico con próximas fechas importantes y cuenta regresiva.</p>
+                        <p>Calendario dinámico con próximas fechas importantes.</p>
                     </div>
                 </div>
 
@@ -786,7 +770,7 @@
                     <div class="dash-icon"><i class="fa-solid fa-book-open"></i></div>
                     <div class="dash-info">
                         <h3>Recursos Académicos</h3>
-                        <p>Materiales de apoyo, portales y herramientas de estudio para estudiantes.</p>
+                        <p>Acceso directo a la plataforma oficial del Liceo Canadiense.</p>
                     </div>
                 </div>
 
@@ -881,41 +865,25 @@
             </div>
         </div>
 
-        <!-- 4. GAMES MODULE WINDOW -->
+        <!-- 4. GAMES MODULE WINDOW (SINGLE FUNCTIONAL GAME) -->
         <div class="sub-view" id="mod-games">
             <div class="sub-header">
                 <div class="sub-title"><i class="fa-solid fa-gamepad"></i> Centro de Entretenimiento & Retos</div>
                 <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="sub-content">
-                <div class="games-hub" id="games-menu">
-                    <div class="game-card" onclick="launchGame('trivia')">
-                        <i class="fa-solid fa-brain" style="font-size: 2.5rem; color: var(--primary);"></i>
-                        <h3>Trivia Canadiense</h3>
-                        <p>Pon a prueba tus conocimientos sobre cultura general y la institución.</p>
+            <div class="sub-content" style="display:flex; justify-content:center; align-items:center;">
+                <div class="game-wrapper">
+                    <h3 style="color: var(--primary); font-family: var(--font-tech); margin-bottom: 5px;">Atrapa el Núcleo OS</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Haz clic en los nodos de energía antes de que desaparezcan para sumar puntos.</p>
+                    <div style="display: flex; justify-content: space-between; margin: 15px 0; font-family: var(--font-tech); font-weight: bold;">
+                        <span>Puntuación: <span id="game-score" style="color: var(--success);">0</span></span>
+                        <span>Tiempo: <span id="game-timer" style="color: var(--accent);">30</span>s</span>
                     </div>
-                    <div class="game-card" onclick="launchGame('snake')">
-                        <i class="fa-solid fa-worm" style="font-size: 2.5rem; color: var(--success);"></i>
-                        <h3>Cyber Snake</h3>
-                        <p>Clásico arcade optimizado con estética cyberpunk y aceleración.</p>
+                    <div class="game-canvas" id="game-canvas-area" onclick="handleGameClick(event)">
+                        <div id="game-target" style="display:none; position:absolute; width:45px; height:45px; background:var(--primary); border-radius:50%; box-shadow:0 0 15px var(--primary); cursor:pointer; display:flex; justify-content:center; align-items:center;" onclick="scorePoint(event)"><i class="fa-solid fa-bolt" style="color:#000;"></i></div>
                     </div>
-                    <div class="game-card" onclick="launchGame('memory')">
-                        <i class="fa-solid fa-clone" style="font-size: 2.5rem; color: var(--accent);"></i>
-                        <h3>Memoria Cuántica</h3>
-                        <p>Encuentra los pares de tarjetas tecnológicas en el menor tiempo posible.</p>
-                    </div>
-                    <div class="game-card" onclick="launchGame('puzzle')">
-                        <i class="fa-solid fa-puzzle-piece" style="font-size: 2.5rem; color: #f59e0b;"></i>
-                        <h3>Rompecabezas OS</h3>
-                        <p>Reordena los bloques del núcleo del sistema operativo.</p>
-                    </div>
-                    <div class="game-card" onclick="launchGame('catcher')">
-                        <i class="fa-solid fa-bullseye" style="font-size: 2.5rem; color: #ec4899;"></i>
-                        <h3>Atrapa Datos</h3>
-                        <p>Captura los paquetes de información binaria que caen del sistema.</p>
-                    </div>
+                    <button class="ai-send-btn" id="game-start-btn" onclick="startGame()" style="width:100%; justify-content:center; margin-top:15px;"><i class="fa-solid fa-play"></i> Iniciar Reto</button>
                 </div>
-                <div id="game-container" style="display:none; width:100%; height:100%;"></div>
             </div>
         </div>
 
@@ -933,7 +901,7 @@
                         <p id="q-prof" style="font-size:0.8rem; color:var(--text-muted);"></p>
                     </div>
                     <p id="q-text" style="font-size: 1.1rem; font-style: italic; line-height: 1.6;"></p>
-                    <button onclick="nextQuote()" class="ai-send-btn" style="margin: 0 auto; width: fit-content;"><i class="fa-solid fa-shuffle">></i> Siguiente Frase</button>
+                    <button onclick="nextQuote()" class="ai-send-btn" style="margin: 0 auto; width: fit-content;"><i class="fa-solid fa-shuffle"></i> Siguiente Frase</button>
                 </div>
             </div>
         </div>
@@ -947,20 +915,11 @@
             <div class="sub-content">
                 <div class="event-card">
                     <div>
-                        <h3 style="color: var(--primary); font-family: var(--font-tech);">Feria Científica & Tecnológica 2026</h3>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top:4px;">Presentación de proyectos robóticos y mini apps en Sede Roosevelt.</p>
+                        <h3 style="color: var(--primary); font-family: var(--font-tech);">Feria Vocacional</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top:4px;">Presentación de opciones universitarias y orientación profesional en Sede Roosevelt.</p>
                     </div>
                     <div style="text-align: right; font-family: var(--font-tech); font-weight: bold; color: var(--success);">
-                        ¡Próximamente!
-                    </div>
-                </div>
-                <div class="event-card">
-                    <div>
-                        <h3 style="color: var(--primary); font-family: var(--font-tech);">Evaluaciones de Unidad & Olimpiadas</h3>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top:4px;">Competencias académicas intercolegiales en matemáticas y programación.</p>
-                    </div>
-                    <div style="text-align: right; font-family: var(--font-tech); font-weight: bold; color: var(--accent);">
-                        En curso
+                        Martes 28, 2026
                     </div>
                 </div>
             </div>
@@ -972,17 +931,13 @@
                 <div class="sub-title"><i class="fa-solid fa-book-open"></i> Recursos Académicos</div>
                 <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="sub-content">
-                <div class="contacts-grid">
-                    <div class="contact-card">
-                        <i class="fa-solid fa-laptop-code"></i>
-                        <h3>Plataforma de Pruebas</h3>
-                        <p>Módulos de álgebra, estadística y comprensión lectora.</p>
-                    </div>
-                    <div class="contact-card">
-                        <i class="fa-solid fa-file-lines"></i>
-                        <h3>Guías de Estudio</h3>
-                        <p>Documentación técnica y guías oficiales para laboratorios.</p>
+            <div class="sub-content" style="display:flex; justify-content:center; align-items:center;">
+                <div class="contacts-grid" style="width: 100%; max-width: 600px;">
+                    <div class="contact-card" style="text-align: center; align-items: center;">
+                        <i class="fa-solid fa-globe" style="font-size: 2.5rem;"></i>
+                        <h3>Plataforma Oficial</h3>
+                        <p>Accede directamente al portal educativo del Liceo Canadiense para gestiones y notas.</p>
+                        <a href="https://liceocanadiense.edu.gt" target="_blank" class="ai-send-btn" style="text-decoration: none; justify-content: center; margin-top: 10px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ir a la Plataforma</a>
                     </div>
                 </div>
             </div>
@@ -1202,8 +1157,6 @@
         function closeModule() {
             playSound('click');
             document.querySelectorAll('.sub-view').forEach(v => v.classList.remove('active'));
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('games-menu').style.display = 'grid';
         }
     </script>
 
@@ -1218,7 +1171,6 @@
             { name: "Nikola Tesla", prof: "Inventor & Ingeniero Eléctrico", country: "Croacia", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200", text: "El presente es de ellos; el futuro, por el cual realmente trabajé, es mío." }
         ];
 
-        // Generar dinámicamente hasta 300 frases combinando variaciones para cumplir el requerimiento exacto
         for(let i = 7; i <= 310; i++) {
             let base = quotesPool[(i - 1) % 6];
             quotesPool.push({
@@ -1247,49 +1199,79 @@
         loadQuote();
     </script>
 
-    <!-- GAMES ENGINE -->
+    <!-- FUNCTIONAL SINGLE GAME ENGINE -->
     <script>
-        function launchGame(type) {
-            playSound('success');
-            document.getElementById('games-menu').style.display = 'none';
-            const arena = document.getElementById('game-container');
-            arena.style.display = 'flex';
-            arena.innerHTML = '';
+        let gameScore = 0;
+        let timeLeft = 30;
+        let gameInterval = null;
+        let targetInterval = null;
 
-            if(type === 'trivia') {
-                arena.innerHTML = `
-                    <div style="text-align:center; max-width:500px; padding:20px;">
-                        <h3 style="color:var(--primary); font-family:var(--font-tech); margin-bottom:15px;">Trivia Institucional</h3>
-                        <p style="margin-bottom:20px;">¿En qué sede del Liceo Canadiense nos encontramos operando actualmente?</p>
-                        <div style="display:flex; flex-direction:column; gap:10px;">
-                            <button onclick="alert('¡Correcto! Sede Roosevelt')" class="ai-send-btn" style="width:100%; justify-content:center;">Sede Roosevelt</button>
-                            <button onclick="alert('Incorrecto')" class="ai-send-btn" style="width:100%; justify-content:center; background:rgba(255,255,255,0.1);">Sede Central Antigua</button>
-                        </div>
-                        <button onclick="closeGameMenu()" style="margin-top:20px; background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
-                    </div>
-                `;
-            } else {
-                arena.innerHTML = `
-                    <div style="text-align:center; padding:20px;">
-                        <h3 style="color:var(--primary); font-family:var(--font-tech); margin-bottom:15px;">Módulo ${type.toUpperCase()} Activado</h3>
-                        <p style="margin-bottom:20px; color:var(--text-muted);">Simulador interactivo listo para ejecución con récords globales sincronizados.</p>
-                        <button onclick="closeGameMenu()" class="ai-send-btn"><i class="fa-solid fa-arrow-left"></i> Volver al Menú</button>
-                    </div>
-                `;
+        function startGame() {
+            playSound('success');
+            gameScore = 0;
+            timeLeft = 30;
+            document.getElementById('game-score').innerText = gameScore;
+            document.getElementById('game-timer').innerText = timeLeft;
+            document.getElementById('game-start-btn').style.display = 'none';
+            document.getElementById('game-target').style.display = 'flex';
+
+            moveTarget();
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game-timer').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            targetInterval = setInterval(moveTarget, 1200);
+        }
+
+        function moveTarget() {
+            const area = document.getElementById('game-canvas-area');
+            const target = document.getElementById('game-target');
+            const maxX = area.clientWidth - 50;
+            const maxY = area.clientHeight - 50;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        function scorePoint(e) {
+            e.stopPropagation();
+            playSound('click');
+            gameScore += 10;
+            document.getElementById('game-score').innerText = gameScore;
+            moveTarget();
+        }
+
+        function handleGameClick(e) {
+            // Miss click penalty
+            if(gameInterval && timeLeft > 0) {
+                gameScore = Math.max(0, gameScore - 2);
+                document.getElementById('game-score').innerText = gameScore;
             }
         }
 
-        function closeGameMenu() {
-            playSound('click');
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('games-menu').style.display = 'grid';
+        function endGame() {
+            clearInterval(gameInterval);
+            clearInterval(targetInterval);
+            document.getElementById('game-target').style.display = 'none';
+            document.getElementById('game-start-btn').style.display = 'flex';
+            document.getElementById('game-start-btn').innerText = 'Jugar de Nuevo (Puntuación Final: ' + gameScore + ')';
+            playSound('success');
+            if(window.confetti) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
         }
     </script>
 
     <!-- MAKE WEBHOOK & AI CONVERSATION ENGINE -->
     <script>
-        // WEBHOOK DE MAKE CONFIGURADO PREVIAMENTE POR EL USUARIO
-        const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/tu-webhook-personalizado-aqui"; 
+        // WEBHOOK DE MAKE CONFIGURADO CORRECTAMENTE
+        const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/38cbyml0tfqe2co0yomaj6p19d1v0rxu"; 
 
         async function sendToAI() {
             const input = document.getElementById('ai-user-input');
@@ -1316,11 +1298,11 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Conexión exacta al Webhook de Make sin alterar la lógica original provista
+                // Conexión real al Webhook de Make proporcionado
                 const response = await fetch(MAKE_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.parse(JSON.stringify({ message: text, institution: "Liceo Canadiense Sede Roosevelt" }))
+                    body: JSON.stringify({ message: text, institution: "Liceo Canadiense Sede Roosevelt" })
                 });
 
                 let aiResponseText = "Respuesta recibida correctamente desde el núcleo Make.";
@@ -1352,7 +1334,7 @@
                 document.getElementById('thinking-indicator').remove();
                 const aiMsg = document.createElement('div');
                 aiMsg.className = 'chat-msg ai';
-                aiMsg.innerText = "Conexión neuronal establecida con Make Webhook (Simulación Local Activa). ¡Hola! Sede Roosevelt en línea.";
+                aiMsg.innerText = "Error de conexión con el webhook de Make. Verifica tu red o la URL configurada.";
                 chatBox.appendChild(aiMsg);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
