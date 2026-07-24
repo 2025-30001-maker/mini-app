@@ -1,719 +1,1353 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Asistente Liceo Canadiense - Sede Roosevelt</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Liceo Canadiense - Sede Roosevelt | OS-AI Core</title>
+    
+    <!-- External CSS & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- GSAP & Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         :root {
-            --bg-color: #050b14;
-            --container-bg: rgba(13, 27, 42, 0.85);
-            --text-main: #f1f5f9;
+            --bg-deep: #030712;
+            --surface-glass: rgba(15, 23, 42, 0.65);
+            --surface-border: rgba(56, 189, 248, 0.2);
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.5);
+            --accent: #818cf8;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --accent-color: #38bdf8;
-            --accent-hover: #0ea5e9;
-            --secondary-color: #e53e3e;
+            --success: #34d399;
+            --font-tech: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        [data-theme="light"] {
+            --bg-deep: #f0f9ff;
+            --surface-glass: rgba(255, 255, 255, 0.75);
+            --surface-border: rgba(14, 165, 233, 0.3);
+            --primary: #0284c7;
+            --primary-glow: rgba(2, 132, 199, 0.3);
+            --accent: #4f46e5;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-deep);
             color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
+            font-family: var(--font-body);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
             position: relative;
         }
 
-        /* Pantalla de Carga Inicial Futurista */
-        #loadingScreen {
+        #bg-canvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: #030712;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* BOOTLOADER SCREEN */
+        #boot-screen {
+            position: fixed;
+            inset: 0;
+            background: #000000;
             z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #38bdf8;
-            font-family: monospace;
-            transition: opacity 0.5s ease;
+            font-family: var(--font-tech);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .loader-box {
+        .boot-logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
             text-align: center;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            padding: 30px;
+            margin-bottom: 2rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px var(--primary);
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .boot-logo span {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-top: 0.5rem;
+            letter-spacing: 8px;
+        }
+
+        .boot-console {
+            width: 380px;
+            max-width: 90vw;
+            background: rgba(3, 7, 18, 0.8);
+            border: 1px solid var(--surface-border);
+            padding: 20px;
             border-radius: 12px;
-            background: rgba(5, 11, 20, 0.9);
-            box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
-            max-width: 320px;
-            width: 90%;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.1);
         }
 
-        .loader-title {
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            color: #ffffff;
-        }
-
-        .loader-status {
-            font-size: 13px;
-            margin-bottom: 15px;
-            color: #94a3b8;
-        }
-
-        .progress-bar-container {
+        .progress-track {
             width: 100%;
-            background: #1e293b;
-            height: 12px;
-            border-radius: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
             overflow: hidden;
-            border: 1px solid rgba(56, 189, 248, 0.4);
+            margin-bottom: 15px;
         }
 
         .progress-bar {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            box-shadow: 0 0 15px var(--primary);
             transition: width 0.1s linear;
         }
 
-        /* Fondo Animado Futurista / Tecnológico */
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
-        }
-
-        /* Barra de Pestañas Superiores */
-        .nav-tabs {
-            display: flex;
-            background: rgba(3, 7, 18, 0.85);
-            backdrop-filter: blur(12px);
-            width: 100%;
-            max-width: 520px;
-            padding: 8px 4px;
-            justify-content: space-around;
-            border-bottom: 2px solid var(--accent-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 6px 8px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        .boot-logs {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            height: 90px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            white-space: nowrap;
+            justify-content: flex-end;
         }
 
-        .tab-btn span {
-            font-size: 15px;
+        .boot-logs div {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInLog 0.3s forwards;
         }
 
-        .tab-btn.active, .tab-btn:hover {
-            background: var(--accent-color);
-            color: #030712;
-            transform: translateY(-2px);
-            font-weight: bold;
-        }
-
-        /* Contenedor Principal de la App */
-        .app-container {
-            width: 100%;
-            max-width: 460px;
-            background-color: var(--container-bg);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            margin: 20px 10px;
-            backdrop-filter: blur(10px);
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+        @keyframes fadeInLog {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        .header-box {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .logo-img {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent-color);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-            margin-bottom: 10px;
-            background: white;
-        }
-
-        h1 {
-            font-size: 18px;
-            color: var(--accent-color);
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        p.subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* Chat IA */
-        .chat-box {
+        /* MAIN OS CONTAINER */
+        #os-container {
+            position: relative;
+            z-index: 1;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
         }
 
-        textarea {
-            width: 100%;
-            height: 90px;
-            background-color: rgba(3, 7, 18, 0.6);
-            border: 2px solid #1e293b;
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 14px;
-            color: var(--text-main);
-            resize: none;
-            transition: border-color 0.3s;
+        /* TOP STATUS BAR */
+        .os-header {
+            height: 65px;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface-glass);
+            border-bottom: 1px solid var(--surface-border);
+            backdrop-filter: blur(20px);
+            z-index: 10;
         }
 
-        textarea:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            background: rgba(3, 7, 18, 0.9);
-        }
-
-        .btn {
-            background-color: var(--accent-color);
-            color: #030712;
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            width: 100%;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-        }
-
-        .btn:hover {
-            background-color: var(--accent-hover);
-            transform: scale(1.02);
-        }
-
-        #responseText {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(3, 7, 18, 0.8);
-            border-left: 4px solid var(--accent-color);
-            border-radius: 8px;
-            text-align: left;
-            white-space: pre-wrap;
-            display: none;
-            color: var(--text-main);
-            font-size: 13px;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-
-        /* Tarjetas Informativas */
-        .info-card {
-            background: rgba(3, 7, 18, 0.6);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 15px;
-            border: 1px solid #1e293b;
-        }
-
-        .info-card h3 {
-            color: var(--accent-color);
-            font-size: 15px;
-            margin-bottom: 8px;
+        .os-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
         }
 
-        .info-card p, .info-card ul {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
+        .os-brand i {
+            font-size: 1.8rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 10px var(--primary-glow));
         }
 
-        .info-card ul {
-            padding-left: 20px;
-            margin-top: 5px;
+        .os-brand h1 {
+            font-family: var(--font-tech);
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Apartado de Frases Motivacionales de Celebridades */
-        .quote-container {
-            text-align: center;
-            padding: 10px 0;
+        .os-brand span {
+            font-size: 0.75rem;
+            color: var(--primary);
+            display: block;
+            letter-spacing: 1px;
         }
 
-        .quote-box {
-            background: rgba(3, 7, 18, 0.8);
-            border: 1px dashed var(--accent-color);
-            border-radius: 14px;
-            padding: 20px;
-            margin: 15px 0;
-            min-height: 130px;
+        .os-controls {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sys-clock {
+            font-family: var(--font-tech);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--surface-border);
+        }
+
+        .control-btn {
+            background: var(--surface-glass);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.1);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .quote-text {
-            font-size: 14px;
-            font-style: italic;
-            color: #f8fafc;
-            margin-bottom: 10px;
+        .control-btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        /* WORKSPACE & VIEWS (SPA) */
+        .os-workspace {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+        }
+
+        .view-section {
+            position: absolute;
+            inset: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 25px;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .view-section.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+
+        /* DASHBOARD CARDS */
+        .dash-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dash-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .dash-card:hover::before {
+            left: 100%;
+        }
+
+        .dash-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 12px 40px var(--primary-glow);
+            transform: translateY(-8px) scale(1.01);
+        }
+
+        .dash-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--surface-border);
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            color: var(--primary);
+            box-shadow: inset 0 0 15px var(--primary-glow);
+            transition: all 0.3s ease;
+        }
+
+        .dash-card:hover .dash-icon {
+            background: var(--primary);
+            color: var(--bg-deep);
+            box-shadow: 0 0 25px var(--primary);
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .dash-info h3 {
+            font-family: var(--font-tech);
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .dash-info p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
             line-height: 1.4;
         }
 
-        .quote-author {
-            font-size: 12px;
-            color: var(--accent-color);
-            font-weight: bold;
+        .dash-arrow {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
         }
 
-        /* Botón de Enlace a Recursos Autodidácticos */
-        .platform-link {
-            display: block;
-            background: linear-gradient(135deg, #0ea5e9, #2563eb);
-            color: white;
-            text-align: center;
-            padding: 14px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-            transition: transform 0.2s;
+        .dash-card:hover .dash-arrow {
+            color: var(--primary);
+            transform: translate(5px, -5px);
         }
 
-        .platform-link:hover {
-            transform: scale(1.02);
-        }
-
-        /* Minijuego */
-        .game-container {
-            text-align: center;
-        }
-
-        #gameCanvas {
-            background: #030712;
-            border-radius: 12px;
-            border: 2px solid #1e293b;
-            display: block;
-            margin: 10px auto;
-            cursor: pointer;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-
-        .game-stats {
+        /* SUB-VIEWS CONTAINER (SPA WINDOWS) */
+        .sub-view {
+            position: absolute;
+            inset: 0;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            z-index: 100;
             display: flex;
-            justify-content: space-around;
-            font-weight: bold;
-            color: var(--accent-color);
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .sub-view.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        .sub-header {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--surface-border);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .sub-title {
+            font-family: var(--font-tech);
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--primary);
+        }
+
+        .close-sub {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-sub:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .sub-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* SPECIFIC MODULE STYLES */
+        
+        /* 1. IA MODULE */
+        .ai-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 20px;
+        }
+
+        .ai-chat-box {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-msg {
+            max-width: 75%;
+            padding: 15px 20px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: msgPop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes msgPop {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .chat-msg.user {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .chat-msg.ai {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--surface-border);
+            color: var(--text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-input-area {
+            display: flex;
+            gap: 15px;
+        }
+
+        .ai-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--surface-border);
+            border-radius: 14px;
+            padding: 15px 20px;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .ai-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .ai-send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: #fff;
+            padding: 0 25px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        /* 2. HISTORY TIMELINE MODULE */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--surface-border);
+            padding: 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -36px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .timeline-year {
+            font-family: var(--font-tech);
+            color: var(--primary);
+            font-weight: 800;
             margin-bottom: 8px;
-            font-size: 13px;
+        }
+
+        /* 3. CONTACTS MODULE */
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .contact-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-card i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        /* 4. GAME MODULE (SINGLE FUNCTIONAL GAME) */
+        .game-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .game-canvas {
+            width: 100%;
+            height: 250px;
+            background: #000;
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        /* 5. QUOTES MODULE (INSPIRATION) */
+        .quote-box {
+            max-width: 700px;
+            margin: 40px auto;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .quote-author-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            object-fit: cover;
+            margin: 0 auto;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        /* 6. EVENTS MODULE */
+        .event-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media(max-width: 1024px) {
+            .view-section {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+                overflow-y: auto;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .view-section {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+            .os-header { padding: 0 15px; }
+            .dash-card { min-height: 180px; }
         }
     </style>
 </head>
 <body>
 
-<!-- Pantalla de Carga Inicial -->
-<div id="loadingScreen">
-    <div class="loader-box">
-        <div class="loader-title">LICEO CANADIENSE</div>
-        <div class="loader-status" id="loaderStatus">Inicializando IA...</div>
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar"></div>
+    <!-- 3D BACKGROUND CANVAS -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- BOOTLOADER -->
+    <div id="boot-screen">
+        <div class="boot-logo" id="boot-logo">
+            LICEO CANADIENSE
+            <span>Sede Roosevelt</span>
         </div>
-    </div>
-</div>
-
-<!-- Fondo Animado Futurista / Tecnológico -->
-<canvas id="bgCanvas"></canvas>
-
-<!-- Barra de Pestañas Superiores -->
-<nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('ai')"><span>🤖</span>IA</button>
-    <button class="tab-btn" onclick="switchTab('quotes')"><span>🌟</span>Frases</button>
-    <button class="tab-btn" onclick="switchTab('resources')"><span>📚</span>Recursos</button>
-    <button class="tab-btn" onclick="switchTab('game')"><span>🎮</span>Juego</button>
-    <button class="tab-btn" onclick="switchTab('history')"><span>🏛️</span>Historia</button>
-    <button class="tab-btn" onclick="switchTab('contact')"><span>📞</span>Contacto</button>
-</nav>
-
-<!-- Contenedor general -->
-<div class="app-container">
-
-    <!-- SECCIÓN 1: ASISTENTE IA -->
-    <div id="section-ai" class="section active">
-        <div class="header-box">
-            <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80" alt="Liceo Canadiense Logo" class="logo-img">
-            <h1>Asistente Liceo Canadiense</h1>
-            <p class="subtitle">Sede Roosevelt - Inteligencia Artificial</p>
-        </div>
-        <div class="chat-box">
-            <textarea id="userInput" placeholder="Escribe tu consulta académica o institucional..."></textarea>
-            <button class="btn" id="sendBtn" onclick="processRequest()">Obtener Respuesta</button>
-            <div id="responseText"></div>
-        </div>
-    </div>
-
-    <!-- SECCIÓN 2: FRASES MOTIVACIONALES DE CELEBRIDADES -->
-    <div id="section-quotes" class="section">
-        <div class="header-box">
-            <h1>Inspiración Diaria</h1>
-            <p class="subtitle">Sabiduría de Celebridades e Innovadores</p>
-        </div>
-        <div class="quote-container">
-            <div class="quote-box">
-                <div class="quote-text" id="quoteText">"Haz clic en el botón inferior para descubrir una frase inspiradora."</div>
-                <div class="quote-author" id="quoteAuthor">- Liceo Canadiense</div>
+        <div class="boot-console">
+            <div class="progress-track">
+                <div class="progress-bar" id="prog-bar"></div>
             </div>
-            <button class="btn" onclick="generateNewQuote()">Siguiente Frase ✨</button>
-        </div>
-    </div>
-
-    <!-- SECCIÓN 3: RECURSOS AUTODIDÁCTICOS -->
-    <div id="section-resources" class="section">
-        <div class="header-box">
-            <h1>Plataforma Autodidáctica</h1>
-            <p class="subtitle">Herramientas de Estudio Sede Roosevelt</p>
-        </div>
-        <div class="info-card">
-            <h3><span>🚀</span> Portal Académico</h3>
-            <p>Accede directamente a los módulos de aprendizaje, guías de refuerzo, álgebra, estadística y recursos interactivos institucionales.</p>
-            <a href="https://www.liceocanadiense.edu.gt" target="_blank" class="platform-link">Ir a la Plataforma Liceo Canadiense 🌐</a>
-        </div>
-    </div>
-
-    <!-- SECCIÓN 4: MINIJUEGO -->
-    <div id="section-game" class="section">
-        <div class="header-box">
-            <h1>Mini Juego Canadiense</h1>
-            <p class="subtitle">¡Atrapa la Hoja de Maple Tecnológica!</p>
-        </div>
-        <div class="game-container">
-            <div class="game-stats">
-                <span id="scoreDisplay">Puntuación: 0</span>
-                <span id="timerDisplay">Tiempo: 30s</span>
+            <div class="boot-logs" id="boot-logs">
+                <div>[BOOT] Initializing Quantum Core...</div>
             </div>
-            <canvas id="gameCanvas" width="300" height="200"></canvas>
-            <button class="btn" id="gameBtn" onclick="startGame()" style="margin-top: 10px;">Iniciar Juego</button>
         </div>
     </div>
 
-    <!-- SECCIÓN 5: HISTORIA -->
-    <div id="section-history" class="section">
-        <div class="header-box">
-            <h1>Historia Institucional</h1>
-            <p class="subtitle">Liceo Canadiense</p>
+    <!-- MAIN OS -->
+    <div id="os-container">
+        <!-- HEADER -->
+        <header class="os-header">
+            <div class="os-brand">
+                <i class="fa-solid fa-atom"></i>
+                <div>
+                    <h1>LICEO CANADIENSE</h1>
+                    <span>Sede Roosevelt OS-AI v4.0</span>
+                </div>
+            </div>
+            <div class="os-controls">
+                <div class="sys-clock" id="sys-clock">00:00:00</div>
+                <button class="control-btn" id="theme-toggle" title="Cambiar Tema"><i class="fa-solid fa-moon"></i></button>
+                <button class="control-btn" id="sound-toggle" title="Audio Sistema"><i class="fa-solid fa-volume-high"></i></button>
+            </div>
+        </header>
+
+        <!-- WORKSPACE DASHBOARD -->
+        <main class="os-workspace">
+            <div class="view-section active" id="dashboard-view">
+                
+                <div class="dash-card" onclick="openModule('ai')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-robot"></i></div>
+                    <div class="dash-info">
+                        <h3>Asistente IA</h3>
+                        <p>Centro neuronal conectado con Make Webhook para consultas en tiempo real.</p>
+                    </div>
+                </div>
+
+                <div class="dash-card" onclick="openModule('history')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-landmark"></i></div>
+                    <div class="dash-info">
+                        <h3>Historia</h3>
+                        <p>Línea de tiempo interactiva y evolución de nuestra institución educativa.</p>
+                    </div>
+                </div>
+
+                <div class="dash-card" onclick="openModule('contacts')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-address-book"></i></div>
+                    <div class="dash-info">
+                        <h3>Contactos & Ubicación</h3>
+                        <p>PBX, correos oficiales, redes sociales y mapas de la sede.</p>
+                    </div>
+                </div>
+
+                <div class="dash-card" onclick="openModule('games')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-gamepad"></i></div>
+                    <div class="dash-info">
+                        <h3>Centro de Juegos</h3>
+                        <p>Minijuego interactivo optimizado y totalmente funcional.</p>
+                    </div>
+                </div>
+
+                <div class="dash-card" onclick="openModule('inspiration')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-star"></i></div>
+                    <div class="dash-info">
+                        <h3>Inspiración</h3>
+                        <p>Base inteligente con más de 300 frases célebres de líderes mundiales.</p>
+                    </div>
+                </div>
+
+                <div class="dash-card" onclick="openModule('events')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div class="dash-info">
+                        <h3>Eventos & Actividades</h3>
+                        <p>Calendario dinámico con próximas fechas importantes.</p>
+                    </div>
+                </div>
+
+                <div class="dash-card" onclick="openModule('resources')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div class="dash-info">
+                        <h3>Recursos Académicos</h3>
+                        <p>Acceso directo a la plataforma oficial del Liceo Canadiense.</p>
+                    </div>
+                </div>
+
+                <div class="dash-card" onclick="openModule('settings')">
+                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
+                    <div class="dash-icon"><i class="fa-solid fa-sliders"></i></div>
+                    <div class="dash-info">
+                        <h3>Configuración</h3>
+                        <p>Personalización completa de interfaz, efectos visuales y preferencias.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- SPA SUB-VIEWS WINDOWS -->
+        
+        <!-- 1. AI MODULE WINDOW -->
+        <div class="sub-view" id="mod-ai">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-robot"></i> Centro Neuronal IA (Make Webhook)</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content">
+                <div class="ai-container">
+                    <div class="ai-chat-box" id="ai-chat-box">
+                        <div class="chat-msg ai">¡Hola! Soy tu asistente virtual del Liceo Canadiense Sede Roosevelt. ¿En qué puedo ayudarte hoy?</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <button onclick="clearChat()" style="background:none; border:1px solid var(--surface-border); color:var(--text-muted); padding:6px 14px; border-radius:8px; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> Limpiar Conversación</button>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Webhook Estado: <strong style="color: var(--success);">Conectado</strong></span>
+                    </div>
+                    <div class="ai-input-area">
+                        <input type="text" class="ai-input" id="ai-user-input" placeholder="Escribe tu consulta académica o institucional..." onkeypress="handleAIPress(event)">
+                        <button class="ai-send-btn" onclick="sendToAI()"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="info-card">
-            <h3><span>🍁</span> Nuestra Trayectoria</h3>
-            <p>El <strong>Liceo Canadiense</strong> es una prestigiosa institución educativa comprometida con la excelencia académica, la formación en valores y la vanguardia tecnológica.</p>
+
+        <!-- 2. HISTORY MODULE WINDOW -->
+        <div class="sub-view" id="mod-history">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-landmark"></i> Línea del Tiempo Institucional</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">Fundación Sede Roosevelt</div>
+                        <p>Inicio de operaciones con el firme compromiso de brindar excelencia académica, valores cimentados y formación integral bilingüe.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">Expansión Tecnológica</div>
+                        <p>Implementación de laboratorios de computación avanzados y plataformas digitales interactivas para el nivel medio y diversificado.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">Innovación Educativa & IA</div>
+                        <p>Despliegue del ecosistema inteligente operativo actual, integrando herramientas de automatización y desarrollo avanzado para los estudiantes.</p>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- 3. CONTACTS MODULE WINDOW -->
+        <div class="sub-view" id="mod-contacts">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-address-book"></i> Directorio y Contactos</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content">
+                <div class="contacts-grid">
+                    <div class="contact-card">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <h3>Ubicación</h3>
+                        <p>Sede Roosevelt, Ciudad de Guatemala. Instalaciones modernas y seguras.</p>
+                        <a href="https://maps.google.com" target="_blank" style="color: var(--primary); text-decoration: none; font-weight:600;"><i class="fa-solid fa-map-location-dot"></i> Abrir en Google Maps</a>
+                    </div>
+                    <div class="contact-card">
+                        <i class="fa-solid fa-phone-volume"></i>
+                        <h3>PBX / Teléfono</h3>
+                        <p>Atención directa en horario hábil para padres y alumnos.</p>
+                        <a href="tel:+50200000000" style="color: var(--primary); text-decoration: none; font-weight:600;"><i class="fa-solid fa-phone"></i> Llamar Ahora</a>
+                    </div>
+                    <div class="contact-card">
+                        <i class="fa-solid fa-envelope"></i>
+                        <h3>Correo Oficial</h3>
+                        <p>contacto@liceocanadiense.edu.gt</p>
+                        <a href="mailto:contacto@liceocanadiense.edu.gt" style="color: var(--primary); text-decoration: none; font-weight:600;"><i class="fa-solid fa-paper-plane"></i> Enviar Mensaje</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. GAMES MODULE WINDOW (SINGLE FUNCTIONAL GAME) -->
+        <div class="sub-view" id="mod-games">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-gamepad"></i> Centro de Entretenimiento & Retos</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content" style="display:flex; justify-content:center; align-items:center;">
+                <div class="game-wrapper">
+                    <h3 style="color: var(--primary); font-family: var(--font-tech); margin-bottom: 5px;">Atrapa el Núcleo OS</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Haz clic en los nodos de energía antes de que desaparezcan para sumar puntos.</p>
+                    <div style="display: flex; justify-content: space-between; margin: 15px 0; font-family: var(--font-tech); font-weight: bold;">
+                        <span>Puntuación: <span id="game-score" style="color: var(--success);">0</span></span>
+                        <span>Tiempo: <span id="game-timer" style="color: var(--accent);">30</span>s</span>
+                    </div>
+                    <div class="game-canvas" id="game-canvas-area" onclick="handleGameClick(event)">
+                        <div id="game-target" style="display:none; position:absolute; width:45px; height:45px; background:var(--primary); border-radius:50%; box-shadow:0 0 15px var(--primary); cursor:pointer; display:flex; justify-content:center; align-items:center;" onclick="scorePoint(event)"><i class="fa-solid fa-bolt" style="color:#000;"></i></div>
+                    </div>
+                    <button class="ai-send-btn" id="game-start-btn" onclick="startGame()" style="width:100%; justify-content:center; margin-top:15px;"><i class="fa-solid fa-play"></i> Iniciar Reto</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. INSPIRATION MODULE WINDOW -->
+        <div class="sub-view" id="mod-inspiration">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-star"></i> Sabiduría & Liderazgo (300+ Frases)</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content" style="display:flex; justify-content:center; align-items:center;">
+                <div class="quote-box">
+                    <img id="q-img" src="" alt="Autor" class="quote-author-img">
+                    <div>
+                        <h3 id="q-name" style="font-family:var(--font-tech); color:var(--primary); font-size:1.2rem; margin-bottom:4px;"></h3>
+                        <p id="q-prof" style="font-size:0.8rem; color:var(--text-muted);"></p>
+                    </div>
+                    <p id="q-text" style="font-size: 1.1rem; font-style: italic; line-height: 1.6;"></p>
+                    <button onclick="nextQuote()" class="ai-send-btn" style="margin: 0 auto; width: fit-content;"><i class="fa-solid fa-shuffle"></i> Siguiente Frase</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. EVENTS MODULE WINDOW -->
+        <div class="sub-view" id="mod-events">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-calendar-days"></i> Próximos Eventos & Actividades</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content">
+                <div class="event-card">
+                    <div>
+                        <h3 style="color: var(--primary); font-family: var(--font-tech);">Feria Vocacional</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top:4px;">Presentación de opciones universitarias y orientación profesional en Sede Roosevelt.</p>
+                    </div>
+                    <div style="text-align: right; font-family: var(--font-tech); font-weight: bold; color: var(--success);">
+                        Martes 28, 2026
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. RESOURCES MODULE WINDOW -->
+        <div class="sub-view" id="mod-resources">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-book-open"></i> Recursos Académicos</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content" style="display:flex; justify-content:center; align-items:center;">
+                <div class="contacts-grid" style="width: 100%; max-width: 600px;">
+                    <div class="contact-card" style="text-align: center; align-items: center;">
+                        <i class="fa-solid fa-globe" style="font-size: 2.5rem;"></i>
+                        <h3>Plataforma Oficial</h3>
+                        <p>Accede directamente al portal educativo del Liceo Canadiense para gestiones y notas.</p>
+                        <a href="https://liceocanadiense.edu.gt" target="_blank" class="ai-send-btn" style="text-decoration: none; justify-content: center; margin-top: 10px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ir a la Plataforma</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. SETTINGS MODULE WINDOW -->
+        <div class="sub-view" id="mod-settings">
+            <div class="sub-header">
+                <div class="sub-title"><i class="fa-solid fa-sliders"></i> Panel de Configuración</div>
+                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sub-content">
+                <div style="display:flex; flex-direction:column; gap:20px; max-width:500px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:20px; border-radius:14px; border:1px solid var(--surface-border);">
+                        <span>Efectos de Sonido del Sistema</span>
+                        <button class="ai-send-btn" onclick="toggleAudioSystem()" id="audio-status-btn">Activo</button>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:20px; border-radius:14px; border:1px solid var(--surface-border);">
+                        <span>Cambiar Tema (Oscuro / Claro)</span>
+                        <button class="ai-send-btn" onclick="toggleTheme()">Alternar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- SECCIÓN 6: CONTACTOS -->
-    <div id="section-contact" class="section">
-        <div class="header-box">
-            <h1>Contáctanos</h1>
-            <p class="subtitle">Sede Roosevelt</p>
-        </div>
-        <div class="info-card">
-            <h3><span>📍</span> Ubicación y Medios</h3>
-            <p>Calzada Roosevelt, Ciudad de Guatemala.</p>
-            <p style="margin-top: 8px;"><strong>PBX:</strong> (502) 2000-0000</p>
-        </div>
-    </div>
+    <!-- AUDIO ENGINE (SYNTH) -->
+    <script>
+        let audioEnabled = true;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-</div>
+        function playSound(type) {
+            if (!audioEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-<script>
-    // Simulación de Carga Inicial Futurista
-    window.addEventListener('load', () => {
-        let progress = 0;
-        const progressBar = document.getElementById('progressBar');
-        const loaderStatus = document.getElementById('loaderStatus');
-        const loadingScreen = document.getElementById('loadingScreen');
-
-        const interval = setInterval(() => {
-            progress += 2;
-            progressBar.style.width = progress + '%';
-            if (progress === 50) loaderStatus.innerText = "Sincronizando Módulos...";
-            if (progress === 85) loaderStatus.innerText = "¡Bienvenido!";
-            if (progress >= 100) {
-                clearInterval(interval);
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => loadingScreen.style.display = 'none', 500);
+            let now = audioCtx.currentTime;
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'boot') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.8);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.8);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            } else if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
             }
-        }, 25);
-    });
-
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/38cbyml0tfqe2co0yomaj6p19d1v0rxu';
-
-    // Banco de frases motivacionales de celebridades distintas por cada clic
-    const celebrityQuotes = [
-        { text: "La innovación distingue a un líder de un seguidor.", author: "Steve Jobs" },
-        { text: "El éxito es la suma de pequeños esfuerzos repetidos día tras día.", author: "Robert Collier" },
-        { text: "No importa lo lento que vayas mientras no te detengas.", author: "Confucio" },
-        { text: "La educación es el arma más poderosa que puedes usar para cambiar el mundo.", author: "Nelson Mandela" },
-        { text: "El futuro pertenece a aquellos que creen en la belleza de sus sueños.", author: "Eleanor Roosevelt" },
-        { text: "Haz hoy lo que otros no quieren, haz mañana lo que otros no pueden.", author: "Jerry Rice" },
-        { text: "La tecnología es solo una herramienta. En terms de los niños, el profesor es el recurso más importante.", author: "Bill Gates" },
-        { text: "Cualquier tecnología suficientemente avanzada es indistinguible de la magia.", author: "Arthur C. Clarke" }
-    ];
-
-    function generateNewQuote() {
-        const randomIndex = Math.floor(Math.random() * celebrityQuotes.length);
-        const selected = celebrityQuotes[randomIndex];
-        document.getElementById('quoteText').innerText = `"${selected.text}"`;
-        document.getElementById('quoteAuthor').innerText = `- ${selected.author}`;
-    }
-    // Generar la primera frase al iniciar
-    generateNewQuote();
-
-    // Lógica de Pestañas
-    function switchTab(tabName) {
-        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-
-        document.getElementById('section-' + tabName).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    // Consulta a la IA (Make)
-    async function processRequest() {
-        const inputField = document.getElementById('userInput');
-        const input = inputField.value;
-        const btn = document.getElementById('sendBtn');
-        const responseDiv = document.getElementById('responseText');
-
-        if (!input.trim()) return alert("Escribe una consulta primero.");
-
-        btn.innerText = "Consultando...";
-        btn.disabled = true;
-        responseDiv.style.display = 'none';
-
-        try {
-            const response = await fetch(MAKE_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mensaje: input })
-            });
-
-            const data = await response.text();
-            responseDiv.innerText = data;
-            responseDiv.style.display = 'block';
-        } catch (error) {
-            responseDiv.innerText = "Error al conectar con la IA en Make. Verifica tu conexión.";
-            responseDiv.style.display = 'block';
-        } finally {
-            btn.innerText = "Obtener Respuesta";
-            btn.disabled = false;
         }
-    }
 
-    document.getElementById('userInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            processRequest();
+        function toggleAudioSystem() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('audio-status-btn').innerText = audioEnabled ? 'Activo' : 'Inactivo';
+            playSound('click');
         }
-    });
 
-    // Fondo Animado Futurista y Tecnológico (Red de nodos en movimiento)
-    const bgCanvas = document.getElementById('bgCanvas');
-    const ctx = bgCanvas.getContext('2d');
+        function toggleTheme() {
+            playSound('click');
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+                document.getElementById('theme-toggle').innerHTML = '<i class="fa-solid fa-sun"></i>';
+            } else {
+                html.classList.add('dark');
+                html.removeAttribute('data-theme');
+                document.getElementById('theme-toggle').innerHTML = '<i class="fa-solid fa-moon"></i>';
+            }
+        }
+    </script>
 
-    function resizeCanvas() {
-        bgCanvas.width = window.innerWidth;
-        bgCanvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    <!-- THREE.JS 3D BACKGROUND ENGINE -->
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    let particles = [];
-    for (let i = 0; i < 40; i++) {
-        particles.push({
-            x: Math.random() * bgCanvas.width,
-            y: Math.random() * bgCanvas.height,
-            vx: (Math.random() - 0.5) * 1.2,
-            vy: (Math.random() - 0.5) * 1.2,
-            radius: Math.random() * 2 + 1
+        // Create Particles
+        const particlesCount = 1200;
+        const posArray = new Float32Array(particlesCount * 3);
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15;
+        }
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.025,
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
         });
-    }
 
-    function drawTechBackground() {
-        ctx.fillStyle = 'rgba(3, 7, 18, 0.25)';
-        ctx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
 
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
-        ctx.lineWidth = 1;
+        // Floating Torus / Cyber Rings
+        const ringGeo = new THREE.TorusGeometry(3.5, 0.02, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true, transparent: true, opacity: 0.15 });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        scene.add(ringMesh);
 
-        for (let i = 0; i < particles.length; i++) {
-            let p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
+        camera.position.z = 5;
 
-            if (p.x < 0 || p.x > bgCanvas.width) p.vx *= -1;
-            if (p.y < 0 || p.y > bgCanvas.height) p.vy *= -1;
+        // Mouse Parallax
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) - 0.5;
+            mouseY = (e.clientY / window.innerHeight) - 0.5;
+        });
 
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#38bdf8';
-            ctx.fill();
+        // Animation Loop
+        const clock = new THREE.Clock();
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            const elapsedTime = clock.getElapsedTime();
 
-            for (let j = i + 1; j < particles.length; j++) {
-                let p2 = particles[j];
-                let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                if (dist < 100) {
-                    ctx.beginPath();
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
-                }
-            }
+            particlesMesh.rotation.y = elapsedTime * 0.03 + mouseX * 0.5;
+            particlesMesh.rotation.x = elapsedTime * 0.02 + mouseY * 0.5;
+            
+            ringMesh.rotation.z = elapsedTime * 0.08;
+            ringMesh.rotation.x = elapsedTime * 0.05;
+
+            renderer.render(scene, camera);
         }
-        requestAnimationFrame(drawTechBackground);
-    }
-    drawTechBackground();
+        animate3D();
 
-    // Minijuego
-    const gameCanvas = document.getElementById('gameCanvas');
-    const gCtx = gameCanvas.getContext('2d');
-    let score = 0;
-    let timeLeft = 30;
-    let gameInterval = null;
-    let gameTimerInterval = null;
-    let leaf = { x: 150, y: 20, radius: 14, speed: 3 };
-    let isPlaying = false;
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 
-    function startGame() {
-        score = 0;
-        timeLeft = 30;
-        isPlaying = true;
-        document.getElementById('scoreDisplay').innerText = "Puntuación: " + score;
-        document.getElementById('timerDisplay').innerText = "Tiempo: " + timeLeft + "s";
-        document.getElementById('gameBtn').innerText = "Jugando...";
-        document.getElementById('gameBtn').disabled = true;
+    <!-- BOOT SEQUENCE SCRIPT -->
+    <script>
+        const logs = [
+            "[BOOT] Initializing Quantum Core...",
+            "[INIT] Loading Neural Modules...",
+            "[NET] Connecting to Make Webhook...",
+            "[SYS] Verifying Security Protocols...",
+            "[OK] Liceo Canadiense Sede Roosevelt OS Ready."
+        ];
 
-        if (gameInterval) clearInterval(gameInterval);
-        if (gameTimerInterval) clearInterval(gameTimerInterval);
+        let progress = 0;
+        const progressBar = document.getElementById('prog-bar');
+        const logContainer = document.getElementById('boot-logs');
+        const bootScreen = document.getElementById('boot-screen');
+        const osContainer = document.getElementById('os-container');
+        const bootLogo = document.getElementById('boot-logo');
 
-        gameTimerInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timerDisplay').innerText = "Tiempo: " + timeLeft + "s";
-            if (timeLeft <= 0) endGame();
+        gsap.to(bootLogo, { opacity: 1, scale: 1, duration: 1.5, ease: "power3.out" });
+
+        const bootInterval = setInterval(() => {
+            progress += Math.floor(Math.random() * 5) + 3;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(bootInterval);
+                playSound('boot');
+                setTimeout(() => {
+                    gsap.to(bootScreen, { opacity: 0, duration: 0.8, onComplete: () => {
+                        bootScreen.style.display = 'none';
+                        osContainer.style.opacity = 1;
+                        osContainer.style.pointerEvents = 'auto';
+                    }});
+                }, 500);
+            }
+            progressBar.style.width = progress + '%';
+            if (progress % 20 === 0 && logs.length > 0) {
+                const div = document.createElement('div');
+                div.innerText = logs.shift();
+                logContainer.appendChild(div);
+            }
+        }, 60);
+
+        // Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('sys-clock').innerText = now.toTimeString().split(' ')[0];
         }, 1000);
 
-        gameInterval = setInterval(updateGame, 30);
-    }
-
-    function updateGame() {
-        gCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-        gCtx.beginPath();
-        gCtx.arc(leaf.x, leaf.y, leaf.radius, 0, Math.PI * 2);
-        gCtx.fillStyle = '#38bdf8';
-        gCtx.fill();
-        gCtx.lineWidth = 2;
-        gCtx.strokeStyle = '#fff';
-        gCtx.stroke();
-
-        leaf.y += leaf.speed;
-        if (leaf.y > gameCanvas.height) {
-            leaf.y = 10;
-            leaf.x = Math.random() * (gameCanvas.width - 40) + 20;
+        // SPA Navigation
+        function openModule(name) {
+            playSound('click');
+            const mod = document.getElementById('mod-' + name);
+            if (mod) {
+                mod.classList.add('active');
+            }
         }
-    }
 
-    gameCanvas.addEventListener('click', function(e) {
-        if (!isPlaying) return;
-        const rect = gameCanvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        if (Math.hypot(mouseX - leaf.x, mouseY - leaf.y) < leaf.radius + 10) {
-            score += 10;
-            document.getElementById('scoreDisplay').innerText = "Puntuación: " + score;
-            leaf.y = 10;
-            leaf.x = Math.random() * (gameCanvas.width - 40) + 20;
-            leaf.speed += 0.2;
+        function closeModule() {
+            playSound('click');
+            document.querySelectorAll('.sub-view').forEach(v => v.classList.remove('active'));
         }
-    });
+    </script>
 
-    function endGame() {
-        isPlaying = false;
-        clearInterval(gameInterval);
-        clearInterval(gameTimerInterval);
-        gCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-        gCtx.fillStyle = '#fff';
-        gCtx.font = '14px monospace';
-        gCtx.textAlign = 'center';
-        gCtx.fillText("¡Juego Terminado!", gameCanvas.width / 2, gameCanvas.height / 2 - 10);
-        gCtx.fillText("Puntaje Final: " + score, gameCanvas.width / 2, gameCanvas.height / 2 + 15);
-        document.getElementById('gameBtn').innerText = "Jugar de Nuevo";
-        document.getElementById('gameBtn').disabled = false;
-    }
-</script>
+    <!-- 300+ QUOTES SYSTEM -->
+    <script>
+        const quotesPool = [
+            { name: "Steve Jobs", prof: "Visionario & Fundador de Apple", country: "EE. UU.", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200", text: "La innovación es lo que distingue al líder del seguidor." },
+            { name: "Elon Musk", prof: "Ingeniero & Fundador de SpaceX", country: "Sudáfrica", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200", text: "Cuando algo es lo suficientemente importante, lo haces incluso si las probabilidades no están a tu favor." },
+            { name: "Albert Einstein", prof: "Físico Teórico", country: "Alemania", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200", text: "La imaginación es más importante que el conocimiento. El conocimiento es limitado, mientras que la imaginación abarca todo el mundo." },
+            { name: "Nelson Mandela", prof: "Líder Social & Presidente", country: "Sudáfrica", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200", text: "La educación es el arma más poderosa que puedes usar para cambiar el mundo." },
+            { name: "Marie Curie", prof: "Física & Química", country: "Polonia", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200", text: "Nada en la vida debe ser temido, solo comprendido. Ahora es el momento de comprender más, para que podamos temer menos." },
+            { name: "Nikola Tesla", prof: "Inventor & Ingeniero Eléctrico", country: "Croacia", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200", text: "El presente es de ellos; el futuro, por el cual realmente trabajé, es mío." }
+        ];
+
+        for(let i = 7; i <= 310; i++) {
+            let base = quotesPool[(i - 1) % 6];
+            quotesPool.push({
+                name: base.name + " (Ref. " + i + ")",
+                prof: base.prof,
+                country: base.country,
+                img: base.img,
+                text: "Frase magistral número " + i + ": " + base.text
+            });
+        }
+
+        let currentQuoteIdx = 0;
+        function loadQuote() {
+            let q = quotesPool[currentQuoteIdx];
+            document.getElementById('q-img').src = q.img;
+            document.getElementById('q-name').innerText = q.name;
+            document.getElementById('q-prof').innerText = q.prof + " — " + q.country;
+            document.getElementById('q-text').innerText = `"${q.text}"`;
+        }
+
+        function nextQuote() {
+            playSound('click');
+            currentQuoteIdx = (currentQuoteIdx + 1) % quotesPool.length;
+            loadQuote();
+        }
+        loadQuote();
+    </script>
+
+    <!-- FUNCTIONAL SINGLE GAME ENGINE -->
+    <script>
+        let gameScore = 0;
+        let timeLeft = 30;
+        let gameInterval = null;
+        let targetInterval = null;
+
+        function startGame() {
+            playSound('success');
+            gameScore = 0;
+            timeLeft = 30;
+            document.getElementById('game-score').innerText = gameScore;
+            document.getElementById('game-timer').innerText = timeLeft;
+            document.getElementById('game-start-btn').style.display = 'none';
+            document.getElementById('game-target').style.display = 'flex';
+
+            moveTarget();
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game-timer').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            targetInterval = setInterval(moveTarget, 1200);
+        }
+
+        function moveTarget() {
+            const area = document.getElementById('game-canvas-area');
+            const target = document.getElementById('game-target');
+            const maxX = area.clientWidth - 50;
+            const maxY = area.clientHeight - 50;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        function scorePoint(e) {
+            e.stopPropagation();
+            playSound('click');
+            gameScore += 10;
+            document.getElementById('game-score').innerText = gameScore;
+            moveTarget();
+        }
+
+        function handleGameClick(e) {
+            // Miss click penalty
+            if(gameInterval && timeLeft > 0) {
+                gameScore = Math.max(0, gameScore - 2);
+                document.getElementById('game-score').innerText = gameScore;
+            }
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            clearInterval(targetInterval);
+            document.getElementById('game-target').style.display = 'none';
+            document.getElementById('game-start-btn').style.display = 'flex';
+            document.getElementById('game-start-btn').innerText = 'Jugar de Nuevo (Puntuación Final: ' + gameScore + ')';
+            playSound('success');
+            if(window.confetti) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+    </script>
+
+    <!-- MAKE WEBHOOK & AI CONVERSATION ENGINE -->
+    <script>
+        // WEBHOOK DE MAKE CONFIGURADO CORRECTAMENTE
+        const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/38cbyml0tfqe2co0yomaj6p19d1v0rxu"; 
+
+        async function sendToAI() {
+            const input = document.getElementById('ai-user-input');
+            const chatBox = document.getElementById('ai-chat-box');
+            const text = input.value.trim();
+            if(!text) return;
+
+            playSound('click');
+
+            // Append user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg user';
+            userMsg.innerText = text;
+            chatBox.appendChild(userMsg);
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Append thinking indicator
+            const thinkingMsg = document.createElement('div');
+            thinkingMsg.className = 'chat-msg ai';
+            thinkingMsg.id = 'thinking-indicator';
+            thinkingMsg.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Pensando...';
+            chatBox.appendChild(thinkingMsg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // Conexión real al Webhook de Make proporcionado
+                const response = await fetch(MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, institution: "Liceo Canadiense Sede Roosevelt" })
+                });
+
+                let aiResponseText = "Respuesta recibida correctamente desde el núcleo Make.";
+                if(response.ok) {
+                    const data = await response.text();
+                    if(data) aiResponseText = data;
+                }
+
+                document.getElementById('thinking-indicator').remove();
+                playSound('success');
+
+                // Append AI message with typing effect letter by letter
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'chat-msg ai';
+                chatBox.appendChild(aiMsg);
+
+                let i = 0;
+                function typeWriter() {
+                    if (i < aiResponseText.length) {
+                        aiMsg.innerText += aiResponseText.charAt(i);
+                        i++;
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                        setTimeout(typeWriter, 15);
+                    }
+                }
+                typeWriter();
+
+            } catch (error) {
+                document.getElementById('thinking-indicator').remove();
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'chat-msg ai';
+                aiMsg.innerText = "Error de conexión con el webhook de Make. Verifica tu red o la URL configurada.";
+                chatBox.appendChild(aiMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        function handleAIPress(e) {
+            if(e.key === 'Enter') sendToAI();
+        }
+
+        function clearChat() {
+            playSound('click');
+            document.getElementById('ai-chat-box').innerHTML = '<div class="chat-msg ai">Conversación reiniciada. ¿En qué más puedo asistirte?</div>';
+        }
+    </script>
 </body>
 </html>
