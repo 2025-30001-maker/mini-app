@@ -198,7 +198,6 @@
         border-radius: 8px;
         text-align: left;
         white-space: pre-wrap;
-        word-wrap: break-word;
         display: none;
         color: var(--text-main);
         font-size: 14px;
@@ -281,11 +280,11 @@
         <div class="header-box">
             <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80" alt="Liceo Canadiense Logo" class="logo-img">
             <h1>Asistente Liceo Canadiense</h1>
-            <p class="subtitle">Sede Roosevelt - Inteligencia Artificial</p>
+            <p class="subtitle" id="motivationalSubtitle">Sede Roosevelt - Inteligencia Artificial</p>
         </div>
         <div class="chat-box">
-            <textarea id="userInput" placeholder="Escribe tu consulta aquí... (Presiona Enter para enviar)"></textarea>
-            <button class="btn" id="sendBtn" onclick="processRequest()">Obtener Respuesta</button>
+            <textarea id="userInput" placeholder="Escribe tu consulta académica o institucional..."></textarea>
+            <button class="btn" id="sendBtn" onclick="processRequest()">Enviar</button>
             <div id="responseText"></div>
         </div>
     </div>
@@ -351,13 +350,27 @@
     tg.ready();
     const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/38cbyml0tfqe2co0yomaj6p19d1v0rxu';
 
-    // Lógica de Pestañas
+    // Frases motivadoras dinámicas por cada clic o cambio de pestaña
+    const motivationalPhrases = [
+        "Sede Roosevelt - Inteligencia Artificial",
+        "Conectando el conocimiento hacia el futuro",
+        "La excelencia no es un acto, es un hábito",
+        "Innovando la educación en cada paso",
+        "Listos para conquistar nuevos retos académicos",
+        "Tu esfuerzo de hoy es tu éxito de mañana"
+    ];
+
+    // Lógica de Pestañas con frases dinámicas
     function switchTab(tabName) {
         document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
         document.getElementById('section-' + tabName).classList.add('active');
         event.currentTarget.classList.add('active');
+
+        // Cambiar frase motivadora aleatoriamente al hacer clic en pestañas
+        const randomPhrase = motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
+        document.getElementById('motivationalSubtitle').innerText = randomPhrase;
     }
 
     // Lógica de consulta a la IA (Make)
@@ -387,7 +400,7 @@
             responseDiv.innerText = "Error al conectar con la IA en Make. Verifica tu conexión.";
             responseDiv.style.display = 'block';
         } finally {
-            btn.innerText = "Obtener Respuesta";
+            btn.innerText = "Enviar";
             btn.disabled = false;
         }
     }
