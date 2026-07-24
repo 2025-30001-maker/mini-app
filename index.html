@@ -427,8 +427,6 @@
             overflow-y: auto;
         }
 
-        /* SPECIFIC MODULE STYLES */
-        
         /* 1. IA MODULE */
         .ai-container {
             display: flex;
@@ -456,6 +454,7 @@
             font-size: 0.95rem;
             line-height: 1.5;
             animation: msgPop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            word-wrap: break-word;
         }
 
         @keyframes msgPop {
@@ -589,7 +588,7 @@
             color: var(--primary);
         }
 
-        /* 4. GAME MODULE (SINGLE FUNCTIONAL GAME) */
+        /* 4. GAME MODULE */
         .game-wrapper {
             max-width: 500px;
             margin: 0 auto;
@@ -612,44 +611,6 @@
             margin-top: 15px;
         }
 
-        /* 5. QUOTES MODULE (INSPIRATION) */
-        .quote-box {
-            max-width: 700px;
-            margin: 40px auto;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--surface-border);
-            border-radius: 24px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .quote-author-img {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            object-fit: cover;
-            margin: 0 auto;
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        /* 6. EVENTS MODULE */
-        .event-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--surface-border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* RESPONSIVE DESIGN */
         @media(max-width: 1024px) {
             .view-section {
                 grid-template-columns: repeat(2, 1fr);
@@ -710,7 +671,6 @@
         <!-- WORKSPACE DASHBOARD -->
         <main class="os-workspace">
             <div class="view-section active" id="dashboard-view">
-                
                 <div class="dash-card" onclick="openModule('ai')">
                     <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
                     <div class="dash-icon"><i class="fa-solid fa-robot"></i></div>
@@ -746,48 +706,10 @@
                         <p>Minijuego interactivo optimizado y totalmente funcional.</p>
                     </div>
                 </div>
-
-                <div class="dash-card" onclick="openModule('inspiration')">
-                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
-                    <div class="dash-icon"><i class="fa-solid fa-star"></i></div>
-                    <div class="dash-info">
-                        <h3>Inspiración</h3>
-                        <p>Base inteligente con más de 300 frases célebres de líderes mundiales.</p>
-                    </div>
-                </div>
-
-                <div class="dash-card" onclick="openModule('events')">
-                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
-                    <div class="dash-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                    <div class="dash-info">
-                        <h3>Eventos & Actividades</h3>
-                        <p>Calendario dinámico con próximas fechas importantes.</p>
-                    </div>
-                </div>
-
-                <div class="dash-card" onclick="openModule('resources')">
-                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
-                    <div class="dash-icon"><i class="fa-solid fa-book-open"></i></div>
-                    <div class="dash-info">
-                        <h3>Recursos Académicos</h3>
-                        <p>Acceso directo a la plataforma oficial del Liceo Canadiense.</p>
-                    </div>
-                </div>
-
-                <div class="dash-card" onclick="openModule('settings')">
-                    <i class="fa-solid fa-arrow-up-right-from-square dash-arrow"></i>
-                    <div class="dash-icon"><i class="fa-solid fa-sliders"></i></div>
-                    <div class="dash-info">
-                        <h3>Configuración</h3>
-                        <p>Personalización completa de interfaz, efectos visuales y preferencias.</p>
-                    </div>
-                </div>
-
             </div>
         </main>
 
         <!-- SPA SUB-VIEWS WINDOWS -->
-        
         <!-- 1. AI MODULE WINDOW -->
         <div class="sub-view" id="mod-ai">
             <div class="sub-header">
@@ -827,10 +749,6 @@
                         <div class="timeline-year">Expansión Tecnológica</div>
                         <p>Implementación de laboratorios de computación avanzados y plataformas digitales interactivas para el nivel medio y diversificado.</p>
                     </div>
-                    <div class="timeline-item">
-                        <div class="timeline-year">Innovación Educativa & IA</div>
-                        <p>Despliegue del ecosistema inteligente operativo actual, integrando herramientas de automatización y desarrollo avanzado para los estudiantes.</p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -847,25 +765,12 @@
                         <i class="fa-solid fa-location-dot"></i>
                         <h3>Ubicación</h3>
                         <p>Sede Roosevelt, Ciudad de Guatemala. Instalaciones modernas y seguras.</p>
-                        <a href="https://maps.google.com" target="_blank" style="color: var(--primary); text-decoration: none; font-weight:600;"><i class="fa-solid fa-map-location-dot"></i> Abrir en Google Maps</a>
-                    </div>
-                    <div class="contact-card">
-                        <i class="fa-solid fa-phone-volume"></i>
-                        <h3>PBX / Teléfono</h3>
-                        <p>Atención directa en horario hábil para padres y alumnos.</p>
-                        <a href="tel:+50200000000" style="color: var(--primary); text-decoration: none; font-weight:600;"><i class="fa-solid fa-phone"></i> Llamar Ahora</a>
-                    </div>
-                    <div class="contact-card">
-                        <i class="fa-solid fa-envelope"></i>
-                        <h3>Correo Oficial</h3>
-                        <p>contacto@liceocanadiense.edu.gt</p>
-                        <a href="mailto:contacto@liceocanadiense.edu.gt" style="color: var(--primary); text-decoration: none; font-weight:600;"><i class="fa-solid fa-paper-plane"></i> Enviar Mensaje</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 4. GAMES MODULE WINDOW (SINGLE FUNCTIONAL GAME) -->
+        <!-- 4. GAMES MODULE WINDOW -->
         <div class="sub-view" id="mod-games">
             <div class="sub-header">
                 <div class="sub-title"><i class="fa-solid fa-gamepad"></i> Centro de Entretenimiento & Retos</div>
@@ -879,348 +784,138 @@
                         <span>Puntuación: <span id="game-score" style="color: var(--success);">0</span></span>
                         <span>Tiempo: <span id="game-timer" style="color: var(--accent);">30</span>s</span>
                     </div>
-                    <div class="game-canvas" id="game-canvas-area" onclick="handleGameClick(event)">
-                        <div id="game-target" style="display:none; position:absolute; width:45px; height:45px; background:var(--primary); border-radius:50%; box-shadow:0 0 15px var(--primary); cursor:pointer; display:flex; justify-content:center; align-items:center;" onclick="scorePoint(event)"><i class="fa-solid fa-bolt" style="color:#000;"></i></div>
+                    <div class="game-canvas" id="game-canvas-area">
+                        <div id="game-target" style="display:none; position:absolute; width:45px; height:45px; background:var(--primary); border-radius:50%; box-shadow:0 0 15px var(--primary); cursor:pointer; justify-content:center; align-items:center;" onclick="scorePoint(event)"><i class="fa-solid fa-bolt" style="color:#000;"></i></div>
                     </div>
                     <button class="ai-send-btn" id="game-start-btn" onclick="startGame()" style="width:100%; justify-content:center; margin-top:15px;"><i class="fa-solid fa-play"></i> Iniciar Reto</button>
                 </div>
             </div>
         </div>
-
-        <!-- 5. INSPIRATION MODULE WINDOW -->
-        <div class="sub-view" id="mod-inspiration">
-            <div class="sub-header">
-                <div class="sub-title"><i class="fa-solid fa-star"></i> Sabiduría & Liderazgo (300+ Frases)</div>
-                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="sub-content" style="display:flex; justify-content:center; align-items:center;">
-                <div class="quote-box">
-                    <img id="q-img" src="" alt="Autor" class="quote-author-img">
-                    <div>
-                        <h3 id="q-name" style="font-family:var(--font-tech); color:var(--primary); font-size:1.2rem; margin-bottom:4px;"></h3>
-                        <p id="q-prof" style="font-size:0.8rem; color:var(--text-muted);"></p>
-                    </div>
-                    <p id="q-text" style="font-size: 1.1rem; font-style: italic; line-height: 1.6;"></p>
-                    <button onclick="nextQuote()" class="ai-send-btn" style="margin: 0 auto; width: fit-content;"><i class="fa-solid fa-shuffle"></i> Siguiente Frase</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 6. EVENTS MODULE WINDOW -->
-        <div class="sub-view" id="mod-events">
-            <div class="sub-header">
-                <div class="sub-title"><i class="fa-solid fa-calendar-days"></i> Próximos Eventos & Actividades</div>
-                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="sub-content">
-                <div class="event-card">
-                    <div>
-                        <h3 style="color: var(--primary); font-family: var(--font-tech);">Feria Vocacional</h3>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top:4px;">Presentación de opciones universitarias y orientación profesional en Sede Roosevelt.</p>
-                    </div>
-                    <div style="text-align: right; font-family: var(--font-tech); font-weight: bold; color: var(--success);">
-                        Martes 28, 2026
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 7. RESOURCES MODULE WINDOW -->
-        <div class="sub-view" id="mod-resources">
-            <div class="sub-header">
-                <div class="sub-title"><i class="fa-solid fa-book-open"></i> Recursos Académicos</div>
-                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="sub-content" style="display:flex; justify-content:center; align-items:center;">
-                <div class="contacts-grid" style="width: 100%; max-width: 600px;">
-                    <div class="contact-card" style="text-align: center; align-items: center;">
-                        <i class="fa-solid fa-globe" style="font-size: 2.5rem;"></i>
-                        <h3>Plataforma Oficial</h3>
-                        <p>Accede directamente al portal educativo del Liceo Canadiense para gestiones y notas.</p>
-                        <a href="https://liceocanadiense.edu.gt" target="_blank" class="ai-send-btn" style="text-decoration: none; justify-content: center; margin-top: 10px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ir a la Plataforma</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 8. SETTINGS MODULE WINDOW -->
-        <div class="sub-view" id="mod-settings">
-            <div class="sub-header">
-                <div class="sub-title"><i class="fa-solid fa-sliders"></i> Panel de Configuración</div>
-                <button class="close-sub" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="sub-content">
-                <div style="display:flex; flex-direction:column; gap:20px; max-width:500px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:20px; border-radius:14px; border:1px solid var(--surface-border);">
-                        <span>Efectos de Sonido del Sistema</span>
-                        <button class="ai-send-btn" onclick="toggleAudioSystem()" id="audio-status-btn">Activo</button>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.6); padding:20px; border-radius:14px; border:1px solid var(--surface-border);">
-                        <span>Cambiar Tema (Oscuro / Claro)</span>
-                        <button class="ai-send-btn" onclick="toggleTheme()">Alternar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- AUDIO ENGINE (SYNTH) -->
+    <!-- SYSTEM SCRIPT LOGIC & MAKE WEBHOOK INTEGRATION -->
     <script>
-        let audioEnabled = true;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const webhookUrl = "https://hook.us2.make.com/38cbyml0tfqe2co0yomaj6p19d1v0rxu";
 
-        function playSound(type) {
-            if (!audioEnabled) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            let now = audioCtx.currentTime;
-            if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-                osc.start(now);
-                osc.stop(now + 0.05);
-            } else if (type === 'boot') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.exponentialRampToValueAtTime(600, now + 0.8);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.8);
-                osc.start(now);
-                osc.stop(now + 0.8);
-            } else if (type === 'success') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.setValueAtTime(659.25, now + 0.1);
-                osc.frequency.setValueAtTime(783.99, now + 0.2);
-                gain.gain.setValueAtTime(0.08, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            }
-        }
-
-        function toggleAudioSystem() {
-            audioEnabled = !audioEnabled;
-            document.getElementById('audio-status-btn').innerText = audioEnabled ? 'Activo' : 'Inactivo';
-            playSound('click');
-        }
-
-        function toggleTheme() {
-            playSound('click');
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                html.setAttribute('data-theme', 'light');
-                document.getElementById('theme-toggle').innerHTML = '<i class="fa-solid fa-sun"></i>';
-            } else {
-                html.classList.add('dark');
-                html.removeAttribute('data-theme');
-                document.getElementById('theme-toggle').innerHTML = '<i class="fa-solid fa-moon"></i>';
-            }
-        }
-    </script>
-
-    <!-- THREE.JS 3D BACKGROUND ENGINE -->
-    <script>
-        const canvas = document.getElementById('bg-canvas');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Create Particles
-        const particlesCount = 1200;
-        const posArray = new Float32Array(particlesCount * 3);
-        for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 15;
-        }
-
-        const particlesGeometry = new THREE.BufferGeometry();
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.025,
-            color: 0x38bdf8,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        // Floating Torus / Cyber Rings
-        const ringGeo = new THREE.TorusGeometry(3.5, 0.02, 16, 100);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true, transparent: true, opacity: 0.15 });
-        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-        scene.add(ringMesh);
-
-        camera.position.z = 5;
-
-        // Mouse Parallax
-        let mouseX = 0, mouseY = 0;
-        window.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth) - 0.5;
-            mouseY = (e.clientY / window.innerHeight) - 0.5;
-        });
-
-        // Animation Loop
-        const clock = new THREE.Clock();
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-            const elapsedTime = clock.getElapsedTime();
-
-            particlesMesh.rotation.y = elapsedTime * 0.03 + mouseX * 0.5;
-            particlesMesh.rotation.x = elapsedTime * 0.02 + mouseY * 0.5;
-            
-            ringMesh.rotation.z = elapsedTime * 0.08;
-            ringMesh.rotation.x = elapsedTime * 0.05;
-
-            renderer.render(scene, camera);
-        }
-        animate3D();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
-
-    <!-- BOOT SEQUENCE SCRIPT -->
-    <script>
-        const logs = [
-            "[BOOT] Initializing Quantum Core...",
-            "[INIT] Loading Neural Modules...",
-            "[NET] Connecting to Make Webhook...",
-            "[SYS] Verifying Security Protocols...",
-            "[OK] Liceo Canadiense Sede Roosevelt OS Ready."
-        ];
-
-        let progress = 0;
-        const progressBar = document.getElementById('prog-bar');
-        const logContainer = document.getElementById('boot-logs');
-        const bootScreen = document.getElementById('boot-screen');
-        const osContainer = document.getElementById('os-container');
-        const bootLogo = document.getElementById('boot-logo');
-
-        gsap.to(bootLogo, { opacity: 1, scale: 1, duration: 1.5, ease: "power3.out" });
-
-        const bootInterval = setInterval(() => {
-            progress += Math.floor(Math.random() * 5) + 3;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(bootInterval);
-                playSound('boot');
-                setTimeout(() => {
-                    gsap.to(bootScreen, { opacity: 0, duration: 0.8, onComplete: () => {
-                        bootScreen.style.display = 'none';
-                        osContainer.style.opacity = 1;
-                        osContainer.style.pointerEvents = 'auto';
-                    }});
-                }, 500);
-            }
-            progressBar.style.width = progress + '%';
-            if (progress % 20 === 0 && logs.length > 0) {
-                const div = document.createElement('div');
-                div.innerText = logs.shift();
-                logContainer.appendChild(div);
-            }
-        }, 60);
-
-        // Clock
+        // Clock System
         setInterval(() => {
             const now = new Date();
-            document.getElementById('sys-clock').innerText = now.toTimeString().split(' ')[0];
+            document.getElementById('sys-clock').textContent = now.toTimeString().split(' ')[0];
         }, 1000);
 
-        // SPA Navigation
-        function openModule(name) {
-            playSound('click');
-            const mod = document.getElementById('mod-' + name);
-            if (mod) {
-                mod.classList.add('active');
+        // Bootloader Animation simulation
+        window.addEventListener('load', () => {
+            gsap.to('#boot-logo', { opacity: 1, scale: 1, duration: 1 });
+            gsap.to('#prog-bar', {
+                width: '100%',
+                duration: 1.5,
+                onComplete: () => {
+                    gsap.to('#boot-screen', {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            document.getElementById('boot-screen').style.display = 'none';
+                            document.getElementById('os-container').style.pointerEvents = 'auto';
+                            gsap.to('#os-container', { opacity: 1, duration: 0.8 });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Navigation Management
+        function openModule(modName) {
+            const target = document.getElementById(`mod-${modName}`);
+            if (target) {
+                target.classList.add('active');
             }
         }
 
         function closeModule() {
-            playSound('click');
             document.querySelectorAll('.sub-view').forEach(v => v.classList.remove('active'));
         }
-    </script>
 
-    <!-- 300+ QUOTES SYSTEM -->
-    <script>
-        const quotesPool = [
-            { name: "Steve Jobs", prof: "Visionario & Fundador de Apple", country: "EE. UU.", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200", text: "La innovación es lo que distingue al líder del seguidor." },
-            { name: "Elon Musk", prof: "Ingeniero & Fundador de SpaceX", country: "Sudáfrica", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200", text: "Cuando algo es lo suficientemente importante, lo haces incluso si las probabilidades no están a tu favor." },
-            { name: "Albert Einstein", prof: "Físico Teórico", country: "Alemania", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200", text: "La imaginación es más importante que el conocimiento. El conocimiento es limitado, mientras que la imaginación abarca todo el mundo." },
-            { name: "Nelson Mandela", prof: "Líder Social & Presidente", country: "Sudáfrica", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200", text: "La educación es el arma más poderosa que puedes usar para cambiar el mundo." },
-            { name: "Marie Curie", prof: "Física & Química", country: "Polonia", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200", text: "Nada en la vida debe ser temido, solo comprendido. Ahora es el momento de comprender más, para que podamos temer menos." },
-            { name: "Nikola Tesla", prof: "Inventor & Ingeniero Eléctrico", country: "Croacia", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200", text: "El presente es de ellos; el futuro, por el cual realmente trabajé, es mío." }
-        ];
+        // AI Chat Functionality via Make Webhook
+        async function sendToAI() {
+            const inputField = document.getElementById('ai-user-input');
+            const chatBox = document.getElementById('ai-chat-box');
+            const userText = inputField.value.trim();
 
-        for(let i = 7; i <= 310; i++) {
-            let base = quotesPool[(i - 1) % 6];
-            quotesPool.push({
-                name: base.name + " (Ref. " + i + ")",
-                prof: base.prof,
-                country: base.country,
-                img: base.img,
-                text: "Frase magistral número " + i + ": " + base.text
-            });
+            if (!userText) return;
+
+            // Append User Message
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'chat-msg user';
+            userMsgDiv.textContent = userText;
+            chatBox.appendChild(userMsgDiv);
+            
+            inputField.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Append Loading / Thinking message
+            const aiMsgDiv = document.createElement('div');
+            aiMsgDiv.className = 'chat-msg ai';
+            aiMsgDiv.textContent = "Procesando en el Centro Neuronal...";
+            chatBox.appendChild(aiMsgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: userText })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error en la respuesta del Webhook.");
+                }
+
+                const responseText = await response.text();
+                aiMsgDiv.textContent = responseText;
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                aiMsgDiv.textContent = "Lo siento, hubo un problema al conectar con Make. Verifica tu escenario.";
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        let currentQuoteIdx = 0;
-        function loadQuote() {
-            let q = quotesPool[currentQuoteIdx];
-            document.getElementById('q-img').src = q.img;
-            document.getElementById('q-name').innerText = q.name;
-            document.getElementById('q-prof').innerText = q.prof + " — " + q.country;
-            document.getElementById('q-text').innerText = `"${q.text}"`;
+        function handleAIPress(event) {
+            if (event.key === 'Enter') {
+                sendToAI();
+            }
         }
 
-        function nextQuote() {
-            playSound('click');
-            currentQuoteIdx = (currentQuoteIdx + 1) % quotesPool.length;
-            loadQuote();
+        function clearChat() {
+            const chatBox = document.getElementById('ai-chat-box');
+            chatBox.innerHTML = '<div class="chat-msg ai">Conversación reiniciada. ¿En qué más te puedo ayudar?</div>';
         }
-        loadQuote();
-    </script>
 
-    <!-- FUNCTIONAL SINGLE GAME ENGINE -->
-    <script>
+        // Minigame Logic
         let gameScore = 0;
-        let timeLeft = 30;
+        let gameTimer = 30;
         let gameInterval = null;
         let targetInterval = null;
 
         function startGame() {
-            playSound('success');
+            const target = document.getElementById('game-target');
+            const startBtn = document.getElementById('game-start-btn');
+            
             gameScore = 0;
-            timeLeft = 30;
-            document.getElementById('game-score').innerText = gameScore;
-            document.getElementById('game-timer').innerText = timeLeft;
-            document.getElementById('game-start-btn').style.display = 'none';
-            document.getElementById('game-target').style.display = 'flex';
+            gameTimer = 30;
+            document.getElementById('game-score').textContent = gameScore;
+            document.getElementById('game-timer').textContent = gameTimer;
+            startBtn.style.display = 'none';
+            target.style.display = 'flex';
 
             moveTarget();
 
             gameInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('game-timer').innerText = timeLeft;
-                if(timeLeft <= 0) {
+                gameTimer--;
+                document.getElementById('game-timer').textContent = gameTimer;
+                if (gameTimer <= 0) {
                     endGame();
                 }
             }, 1000);
@@ -1229,30 +924,22 @@
         }
 
         function moveTarget() {
-            const area = document.getElementById('game-canvas-area');
+            const canvasArea = document.getElementById('game-canvas-area');
             const target = document.getElementById('game-target');
-            const maxX = area.clientWidth - 50;
-            const maxY = area.clientHeight - 50;
+            const maxX = canvasArea.clientWidth - 50;
+            const maxY = canvasArea.clientHeight - 50;
             const randomX = Math.floor(Math.random() * maxX);
             const randomY = Math.floor(Math.random() * maxY);
-            target.style.left = randomX + 'px';
-            target.style.top = randomY + 'px';
+
+            target.style.left = `${randomX}px`;
+            target.style.top = `${randomY}px`;
         }
 
-        function scorePoint(e) {
-            e.stopPropagation();
-            playSound('click');
+        function scorePoint(event) {
+            event.stopPropagation();
             gameScore += 10;
-            document.getElementById('game-score').innerText = gameScore;
+            document.getElementById('game-score').textContent = gameScore;
             moveTarget();
-        }
-
-        function handleGameClick(e) {
-            // Miss click penalty
-            if(gameInterval && timeLeft > 0) {
-                gameScore = Math.max(0, gameScore - 2);
-                document.getElementById('game-score').innerText = gameScore;
-            }
         }
 
         function endGame() {
@@ -1260,94 +947,53 @@
             clearInterval(targetInterval);
             document.getElementById('game-target').style.display = 'none';
             document.getElementById('game-start-btn').style.display = 'flex';
-            document.getElementById('game-start-btn').innerText = 'Jugar de Nuevo (Puntuación Final: ' + gameScore + ')';
-            playSound('success');
-            if(window.confetti) {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            }
-        }
-    </script>
-
-    <!-- MAKE WEBHOOK & AI CONVERSATION ENGINE -->
-    <script>
-        // WEBHOOK DE MAKE CONFIGURADO CORRECTAMENTE
-        const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/38cbyml0tfqe2co0yomaj6p19d1v0rxu"; 
-
-        async function sendToAI() {
-            const input = document.getElementById('ai-user-input');
-            const chatBox = document.getElementById('ai-chat-box');
-            const text = input.value.trim();
-            if(!text) return;
-
-            playSound('click');
-
-            // Append user message
-            const userMsg = document.createElement('div');
-            userMsg.className = 'chat-msg user';
-            userMsg.innerText = text;
-            chatBox.appendChild(userMsg);
-            input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Append thinking indicator
-            const thinkingMsg = document.createElement('div');
-            thinkingMsg.className = 'chat-msg ai';
-            thinkingMsg.id = 'thinking-indicator';
-            thinkingMsg.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Pensando...';
-            chatBox.appendChild(thinkingMsg);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                // Conexión real al Webhook de Make proporcionado
-                const response = await fetch(MAKE_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, institution: "Liceo Canadiense Sede Roosevelt" })
-                });
-
-                let aiResponseText = "Respuesta recibida correctamente desde el núcleo Make.";
-                if(response.ok) {
-                    const data = await response.text();
-                    if(data) aiResponseText = data;
-                }
-
-                document.getElementById('thinking-indicator').remove();
-                playSound('success');
-
-                // Append AI message with typing effect letter by letter
-                const aiMsg = document.createElement('div');
-                aiMsg.className = 'chat-msg ai';
-                chatBox.appendChild(aiMsg);
-
-                let i = 0;
-                function typeWriter() {
-                    if (i < aiResponseText.length) {
-                        aiMsg.innerText += aiResponseText.charAt(i);
-                        i++;
-                        chatBox.scrollTop = chatBox.scrollHeight;
-                        setTimeout(typeWriter, 15);
-                    }
-                }
-                typeWriter();
-
-            } catch (error) {
-                document.getElementById('thinking-indicator').remove();
-                const aiMsg = document.createElement('div');
-                aiMsg.className = 'chat-msg ai';
-                aiMsg.innerText = "Error de conexión con el webhook de Make. Verifica tu red o la URL configurada.";
-                chatBox.appendChild(aiMsg);
-                chatBox.scrollTop = chatBox.scrollHeight;
+            document.getElementById('game-start-btn').innerHTML = `<i class="fa-solid fa-rotate-right"></i> Jugar de Nuevo (Puntuación Final: ${gameScore})`;
+            
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
             }
         }
 
-        function handleAIPress(e) {
-            if(e.key === 'Enter') sendToAI();
+        // Three.js Background Particle Network Effect
+        const canvas = document.getElementById('bg-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 700;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15;
         }
 
-        function clearChat() {
-            playSound('click');
-            document.getElementById('ai-chat-box').innerHTML = '<div class="chat-msg ai">Conversación reiniciada. ¿En qué más puedo asistirte?</div>';
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const material = new THREE.PointsMaterial({
+            size: 0.025,
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+        camera.position.z = 3;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particlesMesh.rotation.y += 0.0008;
+            particlesMesh.rotation.x += 0.0004;
+            renderer.render(scene, camera);
         }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
