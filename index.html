@@ -3,33 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Asistente Liceo Canadiense</title>
+    <title>Asistente Liceo Canadiense - Sede Roosevelt</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0d1b2a;
-            --container-bg: #ffffff;
+            --bg-color: #0b0f19;
+            --container-bg: rgba(255, 255, 255, 0.95);
             --text-main: #0d1b2a;
             --text-muted: #4a5568;
             --accent-color: #e53e3e;
             --accent-hover: #c53030;
+            --secondary-color: #1a365d;
         }
-        body { font-family: sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 90vh; }
-        .app-container { width: 100%; max-width: 400px; background-color: var(--container-bg); border-radius: 24px; padding: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); text-align: center; }
-        .logo { width: 80px; height: 80px; border-radius: 50%; background: var(--accent-color); display: inline-flex; align-items: center; justify-content: center; font-size: 32px; color: white; margin-bottom: 20px; }
-        textarea { width: 100%; height: 90px; background-color: #f7fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 12px; box-sizing: border-box; margin-bottom: 20px; }
-        .btn { background-color: var(--accent-color); color: white; border: none; border-radius: 14px; padding: 14px; width: 100%; font-weight: 600; cursor: pointer; }
-        #responseText { margin-top: 20px; padding: 15px; background: #f7fafc; border-radius: 14px; text-align: left; white-space: pre-wrap; display: none; color: var(--text-main); font-size: 14px; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo Animado Interactivo */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a202c 0%, #0b0f19 100%);
+        }
+
+        /* Barra de Pestañas Superiores */
+        .nav-tabs {
+            display: flex;
+            background: rgba(13, 27, 42, 0.9);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            justify-content: space-around;
+            border-bottom: 2px solid var(--accent-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #cbd5e0;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 6px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tab-btn span {
+            font-size: 16px;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Contenedor Principal de la App */
+        .app-container {
+            width: 100%;
+            max-width: 460px;
+            background-color: var(--container-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            margin: 20px 10px;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Secciones */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Cabecera y Logotipo */
+        .header-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+            box-shadow: 0 4px 10px rgba(229, 62, 62, 0.4);
+            margin-bottom: 10px;
+            background: white;
+        }
+
+        h1 {
+            font-size: 19px;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Área de Chat con IA */
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 90px;
+            background-color: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 14px;
+            color: var(--text-main);
+            resize: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            background: #fff;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            width: 100%;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        #responseText {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 8px;
+            text-align: left;
+            white-space: pre-wrap;
+            display: none;
+            color: var(--text-main);
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Tarjetas de Historia y Contactos */
+        .info-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-card h3 {
+            color: var(--secondary-color);
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p, .info-card ul {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .info-card ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+
+        /* Estilos del Minijuego */
+        .game-container {
+            text-align: center;
+        }
+
+        #gameCanvas {
+            background: #0f172a;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            display: block;
+            margin: 10px auto;
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Fondo dinámico interactivo -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Barra de Pestañas de Navegación -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('ai')"><span>🤖</span>IA Asistente</button>
+        <button class="tab-btn" onclick="switchTab('history')"><span>🏛️</span>Historia</button>
+        <button class="tab-btn" onclick="switchTab('contact')"><span>📞</span>Contactos</button>
+        <button class="tab-btn" onclick="switchTab('game')"><span>🎮</span>Juego</button>
+    </nav>
+
+    <!-- Contenedor general -->
     <div class="app-container">
-        <div class="logo">💬</div>
-        <h1>Asistente</h1>
-        <p>Escribe tu consulta y obtén la respuesta</p>
-        <textarea id="userInput" placeholder="¿Qué deseas saber?"></textarea>
-        <button class="btn" id="sendBtn" onclick="processRequest()">Obtener Respuesta</button>
-        <div id="responseText"></div>
+
+        <!-- SECCIÓN 1: IA ASISTENTE -->
+        <div id="section-ai" class="section active">
+            <div class="header-box">
+                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80" alt="Liceo Canadiense Logo" class="logo-img">
+                <h1>Asistente Liceo Canadiense</h1>
+                <p class="subtitle">Sede Roosevelt - Inteligencia Artificial</p>
+            </div>
+            <div class="chat-box">
+                <textarea id="userInput" placeholder="Escribe tu consulta aquí... (Presiona Enter para enviar)"></textarea>
+                <button class="btn" id="sendBtn" onclick="processRequest()">Obtener Respuesta</button>
+                <div id="responseText"></div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: HISTORIA -->
+        <div id="section-history" class="section">
+            <div class="header-box">
+                <h1>Historia Institucional</h1>
+                <p class="subtitle">Liceo Canadiense</p>
+            </div>
+            <div class="info-card">
+                <h3><span>🍁</span> Nuestra Trayectoria</h3>
+                <p>El <strong>Liceo Canadiense</strong> es una prestigiosa institución educativa comprometida con la excelencia académica, la formación en valores y la vanguardia tecnológica para preparar a los estudiantes hacia el éxito profesional.</p>
+            </div>
+            <div class="info-card">
+                <h3><span>💡</span> Misión y Visión</h3>
+                <p><strong>Misión:</strong> Formar integralmente a la juventud con altos estándares de calidad educativa e innovación.</p>
+                <p style="margin-top: 6px;"><strong>Visión:</strong> Ser líderes indiscutibles en educación integral y desarrollo tecnológico en el país.</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: CONTACTOS -->
+        <div id="section-contact" class="section">
+            <div class="header-box">
+                <h1>Contáctanos</h1>
+                <p class="subtitle">Sede Roosevelt</p>
+            </div>
+            <div class="info-card">
+                <h3><span>📍</span> Dirección</h3>
+                <p>Calzada Roosevelt, Ciudad de Guatemala.</p>
+            </div>
+            <div class="info-card">
+                <h3><span>📞</span> Medios de Comunicación</h3>
+                <p>Secretaría y Admisiones:</p>
+                <ul>
+                    <li>PBX Institucional: (502) 2000-0000</li>
+                    <li>Soporte de Canales Digitales</li>
+                    <li>Correo: info@liceocanadiense.edu.gt</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: JUEGO -->
+        <div id="section-game" class="section">
+            <div class="header-box">
+                <h1>Mini Juego Canadiense</h1>
+                <p class="subtitle">¡Atrapa la Hoja de Maple!</p>
+            </div>
+            <div class="game-container">
+                <div class="game-stats">
+                    <span id="scoreDisplay">Puntuación: 0</span>
+                    <span id="timerDisplay">Tiempo: 30s</span>
+                </div>
+                <canvas id="gameCanvas" width="300" height="220"></canvas>
+                <button class="btn" id="gameBtn" onclick="startGame()" style="margin-top: 10px;">Iniciar Juego</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -37,12 +350,23 @@
         tg.ready();
         const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/38cbyml0tfqe2co0yomaj6p19d1v0rxu';
 
+        // Lógica de Pestañas
+        function switchTab(tabName) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById('section-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Lógica de consulta a la IA (Make)
         async function processRequest() {
-            const input = document.getElementById('userInput').value;
+            const inputField = document.getElementById('userInput');
+            const input = inputField.value;
             const btn = document.getElementById('sendBtn');
             const responseDiv = document.getElementById('responseText');
 
-            if (!input.trim()) return alert("Escribe algo primero.");
+            if (!input.trim()) return alert("Escribe una consulta primero.");
 
             btn.innerText = "Consultando...";
             btn.disabled = true;
@@ -59,11 +383,148 @@
                 responseDiv.innerText = data;
                 responseDiv.style.display = 'block';
             } catch (error) {
-                alert("Error al conectar con la IA.");
+                responseDiv.innerText = "Error al conectar con la IA en Make. Verifica tu conexión.";
+                responseDiv.style.display = 'block';
             } finally {
                 btn.innerText = "Obtener Respuesta";
                 btn.disabled = false;
             }
+        }
+
+        // Enviar al presionar Enter en el teclado
+        document.getElementById('userInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                processRequest();
+            }
+        });
+
+        // Animación de Fondo Fluida Estilo Partículas / Líneas
+        const bgCanvas = document.getElementById('bgCanvas');
+        const ctx = bgCanvas.getContext('2d');
+
+        function resizeCanvas() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let frames = 0;
+        function drawBackgroundAnimation() {
+            ctx.fillStyle = 'rgba(11, 15, 25, 0.15)';
+            ctx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            frames += 2;
+            let rad = Math.PI / 180;
+            let t = frames * rad;
+
+            let rx = 120 * Math.abs(Math.cos(t * 0.5)) + 40;
+            let ry = 120 * Math.abs(Math.sin(t * 0.5)) + 40;
+            
+            let currentCx = bgCanvas.width / 2;
+            let currentCy = bgCanvas.height / 2;
+
+            ctx.save();
+            ctx.translate(currentCx, currentCy);
+            ctx.rotate(t * 0.2);
+
+            for (let i = 0; i < 3; i++) {
+                let angleOffset = i * (Math.PI / 3);
+                let x = rx * Math.sin(6 * (t + angleOffset));
+                let y = ry * Math.sin(5 * (t + angleOffset));
+                let x1 = rx * Math.sin(6 * (t + angleOffset) + Math.PI/4);
+                let y1 = ry * Math.sin(5 * (t + angleOffset) + Math.PI/4);
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.quadraticCurveTo(x, y, x1, y1);
+                ctx.strokeStyle = i === 0 ? 'rgba(229, 62, 62, 0.6)' : (i === 1 ? 'rgba(56, 189, 248, 0.6)' : 'rgba(168, 85, 247, 0.6)');
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            requestAnimationFrame(drawBackgroundAnimation);
+        }
+        drawBackgroundAnimation();
+
+        // Lógica del Minijuego
+        const gameCanvas = document.getElementById('gameCanvas');
+        const gCtx = gameCanvas.getContext('2d');
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval = null;
+        let gameTimerInterval = null;
+        let leaf = { x: 150, y: 30, radius: 16, speed: 3 };
+        let isPlaying = false;
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            isPlaying = true;
+            document.getElementById('scoreDisplay').innerText = "Puntuación: " + score;
+            document.getElementById('timerDisplay').innerText = "Tiempo: " + timeLeft + "s";
+            document.getElementById('gameBtn').innerText = "Jugando...";
+            document.getElementById('gameBtn').disabled = true;
+
+            if (gameInterval) clearInterval(gameInterval);
+            if (gameTimerInterval) clearInterval(gameTimerInterval);
+
+            gameTimerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timerDisplay').innerText = "Tiempo: " + timeLeft + "s";
+                if (timeLeft <= 0) endGame();
+            }, 1000);
+
+            gameInterval = setInterval(updateGame, 30);
+        }
+
+        function updateGame() {
+            gCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            gCtx.beginPath();
+            gCtx.arc(leaf.x, leaf.y, leaf.radius, 0, Math.PI * 2);
+            gCtx.fillStyle = '#e53e3e';
+            gCtx.fill();
+            gCtx.lineWidth = 2;
+            gCtx.strokeStyle = '#fff';
+            gCtx.stroke();
+
+            leaf.y += leaf.speed;
+            if (leaf.y > gameCanvas.height) {
+                leaf.y = 10;
+                leaf.x = Math.random() * (gameCanvas.width - 40) + 20;
+            }
+        }
+
+        gameCanvas.addEventListener('click', function(e) {
+            if (!isPlaying) return;
+            const rect = gameCanvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            if (Math.hypot(mouseX - leaf.x, mouseY - leaf.y) < leaf.radius + 10) {
+                score += 10;
+                document.getElementById('scoreDisplay').innerText = "Puntuación: " + score;
+                leaf.y = 10;
+                leaf.x = Math.random() * (gameCanvas.width - 40) + 20;
+                leaf.speed += 0.2;
+            }
+        });
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(gameInterval);
+            clearInterval(gameTimerInterval);
+            gCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+            gCtx.fillStyle = '#fff';
+            gCtx.font = '16px sans-serif';
+            gCtx.textAlign = 'center';
+            gCtx.fillText("¡Juego Terminado!", gameCanvas.width / 2, gameCanvas.height / 2 - 10);
+            gCtx.fillText("Puntaje Final: " + score, gameCanvas.width / 2, gameCanvas.height / 2 + 20);
+            document.getElementById('gameBtn').innerText = "Jugar de Nuevo";
+            document.getElementById('gameBtn').disabled = false;
         }
     </script>
 </body>
